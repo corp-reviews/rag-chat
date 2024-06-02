@@ -24,8 +24,11 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.588.0",
 		"@langchain/openai": "^0.1.1",
+		"@smithy/shared-ini-file-loader": "^3.1.0",
 		"@supabase/supabase-js": "^2.43.4",
+		"aws-sdk": "^2.1632.0",
 		"langchain": "^0.2.4",
 		"openai": "^4.47.1"
 	}
