@@ -8,6 +8,7 @@
     export let typing;
     export let selectedModel;
     export let selectedCorpName;
+    export let selectedOption;
 
     let message = '';
 
@@ -70,6 +71,7 @@
 </script>
 
 <div class="flex items-start mt-2 mb-4 mx-4 bg-gray-100 space-x-2">
+    {#if $selectedOption === 'DBLoader'}
     <div class="w-1/4">
         <label for="corp-name" class="block text-sm font-medium text-gray-700">기업명</label>
         <input
@@ -79,7 +81,8 @@
             disabled
         />
     </div>
-    <div class="w-3/4">
+    {/if}
+    <div class={$selectedOption === 'DBLoader' ? 'w-3/4' : 'w-full'}>
         <label for="message" class="block text-sm font-medium text-gray-700">질문</label>
         <input
             id="message"

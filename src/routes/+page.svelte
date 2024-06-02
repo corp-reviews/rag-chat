@@ -5,8 +5,9 @@
     import Header from '../components/Header.svelte';
     import Divider from '../components/Divider.svelte';
     import DBLoader from '../components/DBLoader.svelte';
+    import PDFRAG from '../components/PDFRAG.svelte';
     import { writable } from 'svelte/store';
-  
+
     let comments = [];
     const typing = { author: 'gpt', text: '...', model: '' };
     let apiKey = '';
@@ -14,18 +15,32 @@
     let selectedModel = 'gpt-3.5-turbo';
     const models = ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o'];
     let selectedCorpName = writable('');
-  
+    let selectedOption = writable('DBLoader');
+
     const addComment = (comment) => (comments = [...comments, comment]);
     const removeTypingIndicator = () => (comments = comments.filter(comment => comment.text !== '...'));
     const setError = (message) => (errorMessage = message);
     const handleModelChange = (event) => (selectedModel = event.target.value);
 </script>
-  
+
 <div class="flex h-screen bg-gray-100">
-    <div class="flex-1 flex items-center justify-center border-gray-900 rounded-xl shadow-lg overflow-hidden relative border">
-        <div class="absolute inset-0 flex items-center justify-center">
-            <DBLoader bind:selectedCorpName />
+    <div class="flex-1 flex flex-col items-center justify-center border-gray-900 rounded-xl shadow-lg overflow-hidden relative border">
+        <div class="absolute top-4 left-4">
+            <label for="view-select" class="block text-sm font-medium text-gray-700">View Select</label>
+            <select
+                id="view-select"
+                bind:value={$selectedOption}
+                class="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+            >
+                <option value="DBLoader">기업정보 검색</option>
+                <option value="PDFRAG">PDF-RAG</option>
+            </select>
         </div>
+        {#if $selectedOption === 'DBLoader'}
+            <DBLoader bind:selectedCorpName />
+        {:else}
+            <PDFRAG />
+        {/if}
     </div>
     <div class="flex-1 flex flex-col max-w-md md:max-w-lg border-gray-900 rounded-xl shadow-lg overflow-hidden relative border">
         <div class="flex flex-col h-full pt-16 pb-4 box-border overflow-hidden">
@@ -34,7 +49,7 @@
             <Chatbox {comments} {errorMessage} />
             <Divider />
         </div>
-  
+
         <div class="w-full px-4 py-2 bg-gray-100 flex items-center">
             <div class="w-3/5 pr-2">
                 <label for="api-key" class="block text-sm font-medium text-gray-700">OpenAI API 키</label>
@@ -60,8 +75,8 @@
                 </select>
             </div>
         </div>
-  
-        <ChatInput {apiKey} {addComment} {removeTypingIndicator} {setError} {typing} {selectedModel} bind:selectedCorpName
+
+        <ChatInput {apiKey} {addComment} {removeTypingIndicator} {setError} {typing} {selectedModel} bind:selectedCorpName bind:selectedOption
             class="w-full px-4 py-2 bg-gray-100"
         />
     </div>
