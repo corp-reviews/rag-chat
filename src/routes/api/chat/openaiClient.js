@@ -1,28 +1,33 @@
 // src/routes/api/chat/openaiClient.js
-
-import OpenAI from 'openai';
+import { ChatOpenAI } from "@langchain/openai";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { StringOutputParser } from "@langchain/core/output_parsers";
 
 /**
- * Initializes OpenAI client with provided API key.
+ * Initializes Langchain ChatOpenAI client with provided API key and model.
  * @param {string} apiKey - The API key for OpenAI.
- * @returns {OpenAI} - The OpenAI client instance.
+ * @param {string} model - The model to use for the completion.
+ * @returns {ChatOpenAI} - The ChatOpenAI client instance.
  */
-export function createOpenAIClient(apiKey) {
-    return new OpenAI({ apiKey });
+export function createLangchainClient(apiKey, model) {
+    return new ChatOpenAI({
+        openAIApiKey: apiKey,
+        modelName: model
+    });
 }
 
 /**
- * Sends a message to OpenAI and returns the response.
- * @param {OpenAI} client - The OpenAI client instance.
+ * Sends a message to Langchain ChatOpenAI and returns the response.
+ * @param {ChatOpenAI} client - The ChatOpenAI client instance.
  * @param {string} userInput - The user input to send to OpenAI.
- * @param {string} model - The model to use for the completion.
- * @returns {Promise<string>} - The response from OpenAI.
+ * @returns {Promise<string>} - The response from ChatOpenAI.
  */
-export async function getGPTResponse(client, userInput, model = 'gpt-3.5-turbo') {
-    const response = await client.chat.completions.create({
-        model,
-        messages: [{ role: 'user', content: userInput }],
-    });
+export async function getLangchainResponse(client, userInput) {
+    const messages = [new HumanMessage(userInput)];
+    const parser = new StringOutputParser();
 
-    return response.choices[0].message.content.trim();
+    const chain = client.pipe(parser);
+    const response = await chain.invoke(messages);
+
+    return response;
 }

@@ -36,7 +36,7 @@
         addComment(typingComment);
 
         const corpName = get(selectedCorpName);
-        const reply = await getGPTResponse(comment.text, corpName);
+        const reply = await getLangchainResponse(comment.text, corpName);
 
         if (reply.error) {
             setError(reply.error);
@@ -47,14 +47,14 @@
         }
     }
 
-    async function getGPTResponse(userInput, corpName) {
+    async function getLangchainResponse(userInput, corpName) {
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ userInput, apiKey, selectedModel, corpName }),  // selectedModel 추가
+                body: JSON.stringify({ userInput, apiKey, selectedModel, corpName }),
             });
             const data = await response.json();
             if (response.ok) {
