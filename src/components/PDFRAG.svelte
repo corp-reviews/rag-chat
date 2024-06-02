@@ -50,15 +50,17 @@
         <p class="text-gray-500 text-sm">PDF 파일을 업로드하여 분석하세요.</p>
     </div>
     <div class="w-full flex">
-        <div class="w-1/4 border-r pr-2">
-            <h2 class="text-xl font-bold mb-4">Files</h2>
+        <div class="w-2/5 border-r pr-2">
+            <h2 class="text-xl font-bold mb-4">Uploaded PDF Files</h2>
             <ul class="space-y-2">
                 {#each files as file}
-                    <li class="text-blue-500 hover:underline cursor-pointer">{file}</li>
+                    <li class="text-blue-500 hover:underline cursor-pointer text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                        {file}
+                    </li>
                 {/each}
             </ul>
         </div>
-        <div class="w-3/4 pl-4">
+        <div class="w-3/5 pl-4">
             <input type="file" accept="application/pdf" on:change={handleFileChange} class="mb-4 p-2 border border-gray-300 rounded-md w-full" />
             {#if selectedFile}
                 <button on:click={handleFileUpload} class="p-2 bg-blue-600 text-white rounded-md w-full" disabled={isUploading} class:opacity-50={isUploading}>

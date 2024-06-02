@@ -15,7 +15,7 @@
     let selectedModel = 'gpt-3.5-turbo';
     const models = ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o'];
     let selectedCorpName = writable('');
-    let selectedOption = writable('DBLoader');
+    let selectedOption = writable('PDFRAG');
 
     const addComment = (comment) => (comments = [...comments, comment]);
     const removeTypingIndicator = () => (comments = comments.filter(comment => comment.text !== '...'));
@@ -32,8 +32,8 @@
                 bind:value={$selectedOption}
                 class="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
+            <option value="PDFRAG">PDF-RAG</option>
                 <option value="DBLoader">기업정보 검색</option>
-                <option value="PDFRAG">PDF-RAG</option>
             </select>
         </div>
         {#if $selectedOption === 'DBLoader'}
