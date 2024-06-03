@@ -3,10 +3,10 @@
     import { listFilesFromS3 } from '../lib/s3ListFiles';
     import { deleteFileFromS3 } from '../lib/s3DeleteFile';
     import { createEventDispatcher, onMount } from 'svelte';
-    import GoToNextFivePagesButton from './GoToNextFivePagesButton.svelte';
-    import GoToNextPageButton from './GoToNextPageButton.svelte';
-    import GoToPreviousPageButton from './GoToPreviousPageButton.svelte';
-    import GoToPreviousFivePagesButton from './GoToPreviousFivePagesButton.svelte';
+    import GoToNextFivePagesButton from './pagination/GoToNextFivePagesButton.svelte';
+    import GoToNextPageButton from './pagination/GoToNextPageButton.svelte';
+    import GoToPreviousPageButton from './pagination/GoToPreviousPageButton.svelte';
+    import GoToPreviousFivePagesButton from './pagination/GoToPreviousFivePagesButton.svelte';
 
     let files = [];
     let displayedFiles = [];
@@ -49,6 +49,19 @@
         }
     };
 
+    const handleDeleteAllFiles = async () => {
+        if (confirm('파일을 모두 삭제하시겠습니까?')) {
+            for (const file of files) {
+                const result = await deleteFileFromS3(file.name);
+                if (!result.success) {
+                    console.error(`파일 삭제 실패: ${result.message}`);
+                }
+            }
+            await loadFiles(); // Reload files after deleting all
+            dispatch('allFilesDeleted');
+        }
+    };
+
     onMount(() => {
         loadFiles();
     });
@@ -58,6 +71,7 @@
     <h2 class="text-xl font-bold mb-4">Uploaded PDF Files</h2>
     {#if isLoading}
         <p>파일 로딩중...</p>
+    
     {:else}
         <ul class="space-y-2">
             {#each displayedFiles as file}
@@ -75,6 +89,11 @@
             <span class="px-2 py-1">{currentPage} / {totalPages}</span>
             <GoToNextPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
             <GoToNextFivePagesButton {currentPage} onPageChange={handlePageChange} {totalPages} />
+        </div>
+        <div class="flex justify-center mt-4">
+            <button on:click={handleDeleteAllFiles} class="text-red-500 hover:text-red-700">
+                모두 삭제
+            </button>
         </div>
     {/if}
 </div>
