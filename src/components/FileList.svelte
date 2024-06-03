@@ -40,7 +40,7 @@
         <ul class="space-y-2">
             {#each files as file}
                 <li class="flex justify-between items-center text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                    <a href={file.url} class="text-blue-500 hover:underline cursor-pointer" target="_blank" rel="noopener noreferrer">{file.name}</a>
+                    <a href={file.url} class="text-blue-500 hover:underline cursor-pointer break-words w-4/5" target="_blank" rel="noopener noreferrer">{file.name}</a>
                     <button on:click={() => handleFileDelete(file.name)} class="text-red-500 hover:text-red-700 ml-2">
                         삭제
                     </button>
