@@ -24,15 +24,15 @@
 </script>
 
 <div class="flex h-screen bg-gray-100">
-    <div class="flex-1 flex flex-col items-center justify-center border-gray-900 rounded-xl shadow-lg overflow-hidden relative border">
-        <div class="absolute top-4 left-4">
+    <div class="flex-1 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden mr-2">
+        <div class="absolute top-4 left-4 z-10">
             <label for="view-select" class="block text-sm font-medium text-gray-700">View Select</label>
             <select
                 id="view-select"
                 bind:value={$selectedOption}
                 class="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
             >
-            <option value="PDFRAG">PDF-RAG</option>
+                <option value="PDFRAG">PDF-RAG</option>
                 <option value="DBLoader">기업정보 검색</option>
             </select>
         </div>
@@ -42,16 +42,15 @@
             <PDFRAG />
         {/if}
     </div>
-    <div class="flex-1 flex flex-col max-w-md md:max-w-lg border-gray-900 rounded-xl shadow-lg overflow-hidden relative border">
-        <div class="flex flex-col h-full pt-16 pb-4 box-border overflow-hidden">
-            <Header />
-            <Divider />
-            <Chatbox {comments} {errorMessage} />
-            <Divider />
+    <div class="flex-1 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+        <Header />
+        <Divider />
+        <div class="flex flex-col flex-1 overflow-hidden">
+            <Chatbox {comments} {errorMessage} class="flex-1 overflow-auto" />
         </div>
-
-        <div class="w-full px-4 py-2 bg-gray-100 flex items-center">
-            <div class="w-3/5 pr-2">
+        <Divider />
+        <div class="flex justify-between p-4 bg-gray-100 border-t border-gray-300">
+            <div class="flex-1 pr-2">
                 <label for="api-key" class="block text-sm font-medium text-gray-700">OpenAI API 키</label>
                 <input
                     id="api-key"
@@ -61,7 +60,7 @@
                     placeholder="키 값을 입력하세요"
                 />
             </div>
-            <div class="w-2/5 pl-2">
+            <div class="flex-1 pl-2">
                 <label for="model-select" class="block text-sm font-medium text-gray-700">Select Model</label>
                 <select
                     id="model-select"
@@ -75,7 +74,6 @@
                 </select>
             </div>
         </div>
-
         <ChatInput {apiKey} {addComment} {removeTypingIndicator} {setError} {typing} {selectedModel} bind:selectedCorpName bind:selectedOption
             class="w-full px-4 py-2 bg-gray-100"
         />
