@@ -7,6 +7,7 @@
     import GoToNextPageButton from '../pagination/GoToNextPageButton.svelte';
     import GoToPreviousPageButton from '../pagination/GoToPreviousPageButton.svelte';
     import GoToPreviousFivePagesButton from '../pagination/GoToPreviousFivePagesButton.svelte';
+    import FileUpload from '../PDFRAG/FileUpload.svelte';
 
     let files = [];
     let displayedFiles = [];
@@ -67,33 +68,39 @@
     });
 </script>
 
-<div class="w-2/5 border-r pr-2">
+<div class="w-full flex flex-col items-center">
+    <FileUpload class="mb-4" on:uploadSuccess={loadFiles} />
     <h2 class="text-xl font-bold mb-4">Uploaded PDF Files</h2>
     {#if isLoading}
         <p>파일 로딩중...</p>
-    
+    {:else if files.length === 0}
+        <p>No files uploaded yet.</p>
     {:else}
-        <ul class="space-y-2">
-            {#each displayedFiles as file}
-                <li class="flex justify-between items-center text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                    <a href={file.url} class="text-blue-500 hover:underline cursor-pointer break-words w-4/5" target="_blank" rel="noopener noreferrer">{file.name}</a>
-                    <button on:click={() => handleFileDelete(file.name)} class="text-red-500 hover:text-red-700 ml-2">
-                        삭제
+        <div class="flex flex-col items-center w-full max-h-64 overflow-y-auto">
+            <ul class="space-y-2 w-full">
+                {#each displayedFiles as file}
+                    <li class="flex justify-between items-center text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                        <a href={file.url} class="text-blue-500 hover:underline cursor-pointer break-words w-4/5" target="_blank" rel="noopener noreferrer">{file.name}</a>
+                        <button on:click={() => handleFileDelete(file.name)} class="text-red-500 hover:text-red-700 ml-2">
+                            삭제
+                        </button>
+                    </li>
+                {/each}
+            </ul>
+            {#if files.length > 0}
+                <div class="flex justify-center mt-4">
+                    <GoToPreviousFivePagesButton {currentPage} onPageChange={handlePageChange} />
+                    <GoToPreviousPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
+                    <span class="px-2 py-1">{currentPage} / {totalPages}</span>
+                    <GoToNextPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
+                    <GoToNextFivePagesButton {currentPage} onPageChange={handlePageChange} {totalPages} />
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button on:click={handleDeleteAllFiles} class="text-red-500 hover:text-red-700">
+                        모두 삭제
                     </button>
-                </li>
-            {/each}
-        </ul>
-        <div class="flex justify-center mt-4">
-            <GoToPreviousFivePagesButton {currentPage} onPageChange={handlePageChange} />
-            <GoToPreviousPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-            <span class="px-2 py-1">{currentPage} / {totalPages}</span>
-            <GoToNextPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-            <GoToNextFivePagesButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-        </div>
-        <div class="flex justify-center mt-4">
-            <button on:click={handleDeleteAllFiles} class="text-red-500 hover:text-red-700">
-                모두 삭제
-            </button>
+                </div>
+            {/if}
         </div>
     {/if}
 </div>

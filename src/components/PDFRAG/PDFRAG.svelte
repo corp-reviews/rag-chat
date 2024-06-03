@@ -1,6 +1,5 @@
 <!-- src/components/PDFRAG.svelte -->
 <script>
-    import FileUpload from '../PDFRAG/FileUpload.svelte';
     import FileList from '../PDFRAG/FileList.svelte';
     import ElasticSearchTitles from '../PDFRAG/ElasticSearchTitles.svelte';
 
@@ -20,12 +19,11 @@
         <h1 class="text-2xl font-bold">PDF-RAG</h1>
         <p class="text-gray-500 text-sm">PDF 파일을 업로드하여 분석하세요.</p>
     </div>
-    <div class="flex w-full gap-4">
-        <FileList bind:this={fileListRef} on:fileDeleted={handleFileAction} />
-        <FileUpload on:uploadSuccess={handleFileAction} />
-    </div>
+    <FileList class="mb-4" bind:this={fileListRef} on:fileDeleted={handleFileAction} />
 </div>
 
 <hr class="my-8 w-full border-t-2 border-gray-300" />
 
-<ElasticSearchTitles />
+<div class="w-full max-w-2xl px-4">
+    <ElasticSearchTitles />
+</div>
