@@ -3,16 +3,38 @@
     import { listFilesFromS3 } from '../lib/s3ListFiles';
     import { deleteFileFromS3 } from '../lib/s3DeleteFile';
     import { createEventDispatcher, onMount } from 'svelte';
+    import GoToNextFivePagesButton from './GoToNextFivePagesButton.svelte';
+    import GoToNextPageButton from './GoToNextPageButton.svelte';
+    import GoToPreviousPageButton from './GoToPreviousPageButton.svelte';
+    import GoToPreviousFivePagesButton from './GoToPreviousFivePagesButton.svelte';
 
     let files = [];
+    let displayedFiles = [];
     let isLoading = true;
     const dispatch = createEventDispatcher();
+
+    let currentPage = 1;
+    const filesPerPage = 5;
+    let totalPages = 1;
 
     // export loadFiles function to be callable from outside
     export const loadFiles = async () => {
         isLoading = true;
         files = await listFilesFromS3();
+        totalPages = Math.ceil(files.length / filesPerPage);
+        updateDisplayedFiles();
         isLoading = false;
+    };
+
+    const updateDisplayedFiles = () => {
+        const start = (currentPage - 1) * filesPerPage;
+        const end = start + filesPerPage;
+        displayedFiles = files.slice(start, end);
+    };
+
+    const handlePageChange = (page) => {
+        currentPage = page;
+        updateDisplayedFiles();
     };
 
     const handleFileDelete = async (fileName) => {
@@ -38,7 +60,7 @@
         <p>파일 로딩중...</p>
     {:else}
         <ul class="space-y-2">
-            {#each files as file}
+            {#each displayedFiles as file}
                 <li class="flex justify-between items-center text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
                     <a href={file.url} class="text-blue-500 hover:underline cursor-pointer break-words w-4/5" target="_blank" rel="noopener noreferrer">{file.name}</a>
                     <button on:click={() => handleFileDelete(file.name)} class="text-red-500 hover:text-red-700 ml-2">
@@ -47,5 +69,12 @@
                 </li>
             {/each}
         </ul>
+        <div class="flex justify-center mt-4">
+            <GoToPreviousFivePagesButton {currentPage} onPageChange={handlePageChange} />
+            <GoToPreviousPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
+            <span class="px-2 py-1">{currentPage} / {totalPages}</span>
+            <GoToNextPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
+            <GoToNextFivePagesButton {currentPage} onPageChange={handlePageChange} {totalPages} />
+        </div>
     {/if}
 </div>
