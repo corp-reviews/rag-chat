@@ -24,6 +24,6 @@
 
 <hr class="my-8 w-full border-t-2 border-gray-300" />
 
-<div class="w-full max-w-2xl px-4">
+<div class="w-full max-w-2xl px-4 overflow-y-auto" style="max-height: 600px;">
     <ElasticSearchTitles />
 </div>

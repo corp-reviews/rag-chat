@@ -18,7 +18,9 @@
     const filesPerPage = 5;
     let totalPages = 1;
 
-    // export loadFiles function to be callable from outside
+    let deleteProgress = 0;
+    let deleting = false;
+
     export const loadFiles = async () => {
         isLoading = true;
         files = await listFilesFromS3();
@@ -52,13 +54,18 @@
 
     const handleDeleteAllFiles = async () => {
         if (confirm('파일을 모두 삭제하시겠습니까?')) {
-            for (const file of files) {
+            deleting = true;
+            deleteProgress = 0;
+            const totalFiles = files.length;
+            for (const [index, file] of files.entries()) {
                 const result = await deleteFileFromS3(file.name);
                 if (!result.success) {
                     console.error(`파일 삭제 실패: ${result.message}`);
                 }
+                deleteProgress = ((index + 1) / totalFiles) * 100;
             }
             await loadFiles(); // Reload files after deleting all
+            deleting = false;
             dispatch('allFilesDeleted');
         }
     };
@@ -100,6 +107,11 @@
                         모두 삭제
                     </button>
                 </div>
+                {#if deleting}
+                    <div class="w-full bg-gray-200 rounded mt-4">
+                        <div class="bg-red-500 text-xs leading-none py-1 text-center text-white" style="width: {deleteProgress}%;">{deleteProgress}%</div>
+                    </div>
+                {/if}
             {/if}
         </div>
     {/if}
