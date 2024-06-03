@@ -4,8 +4,14 @@
     import FileList from './FileList.svelte';
     import ElasticSearchTitles from './ElasticSearchTitles.svelte';
 
-    const handleFileAction = () => {
-        document.querySelector('file-list').loadFiles();
+    let fileListRef;
+
+    const handleFileAction = async () => {
+        if (fileListRef && typeof fileListRef.loadFiles === 'function') {
+            await fileListRef.loadFiles();
+        } else {
+            console.error('fileListRef is not properly bound or loadFiles is not a function');
+        }
     }
 </script>
 
@@ -15,7 +21,7 @@
         <p class="text-gray-500 text-sm">PDF 파일을 업로드하여 분석하세요.</p>
     </div>
     <div class="w-full flex">
-        <FileList on:fileDeleted={handleFileAction} />
+        <FileList bind:this={fileListRef} on:fileDeleted={handleFileAction} />
         <FileUpload on:uploadSuccess={handleFileAction} />
     </div>
 </div>

@@ -8,7 +8,8 @@
     let isLoading = true;
     const dispatch = createEventDispatcher();
 
-    const loadFiles = async () => {
+    // export loadFiles function to be callable from outside
+    export const loadFiles = async () => {
         isLoading = true;
         files = await listFilesFromS3();
         isLoading = false;

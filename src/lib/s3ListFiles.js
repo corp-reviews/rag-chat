@@ -20,7 +20,7 @@ export async function listFilesFromS3() {
     try {
         const command = new ListObjectsV2Command(params);
         const data = await s3Client.send(command);
-        const files = data.Contents.filter(file => file.Key.endsWith('.pdf')).map(async file => {
+        const files = data.Contents.filter(file => file.Key.toLowerCase().endsWith('.pdf')).map(async file => {
             const getObjectCommand = new GetObjectCommand({
                 Bucket: get(bucketName),
                 Key: file.Key
