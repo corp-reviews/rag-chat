@@ -38,9 +38,9 @@
     {:else}
         <ul class="space-y-2">
             {#each files as file}
-                <li class="flex justify-between items-center text-blue-500 hover:underline cursor-pointer text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                    <span>{file}</span>
-                    <button on:click={() => handleFileDelete(file)} class="text-red-500 hover:text-red-700">
+                <li class="flex justify-between items-center text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                    <span class="text-blue-500 hover:underline cursor-pointer">{file}</span>
+                    <button on:click={() => handleFileDelete(file)} class="text-red-500 hover:text-red-700 ml-2">
                         삭제
                     </button>
                 </li>
