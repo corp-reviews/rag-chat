@@ -3,13 +3,16 @@
     import { uploadFileToS3 } from '../lib/s3Upload';
     import { listFilesFromS3 } from '../lib/s3ListFiles';
     import { onMount } from 'svelte';
-    import { bucketName } from '../stores/env';
+    import { bucketName, elasticsearchUsername, elasticsearchPassword } from '../stores/env';
+    import axios from 'axios';
 
     let selectedFile = null;
     let uploadMessage = '';
     let fileName = '';
     let isUploading = false;
     let files = [];
+    let elasticTitles = [];
+    let errorMessage = '';
 
     const handleFileChange = (event) => {
         selectedFile = event.target.files[0];
@@ -39,8 +42,45 @@
         files = await listFilesFromS3();
     };
 
+    const fetchElasticTitles = async () => {
+        try {
+            const username = $elasticsearchUsername;
+            const password = $elasticsearchPassword;
+            const auth = `Basic ${btoa(`${username}:${password}`)}`;
+
+            const response = await axios.get('https://elasticsearch.corp.reviews:9200/pdf_objects/_search', {
+                params: {
+                    q: '*',
+                    size: 10,
+                    _source: 'title'
+                },
+                headers: {
+                    'Authorization': auth
+                }
+            });
+
+            console.log(response.data); // 응답 데이터 구조 확인
+
+            if (response.data.hits && response.data.hits.hits) {
+                elasticTitles = response.data.hits.hits.map(hit => {
+                    if (hit._source) {
+                        console.log(hit._source); // _source 필드 확인
+                        return hit._source.title ? hit._source.title : 'No Title';
+                    } else {
+                        return 'No Title';
+                    }
+                });
+            } else {
+                errorMessage = '응답 데이터 구조가 예상과 다릅니다.';
+            }
+        } catch (error) {
+            errorMessage = '엘라스틱서치 데이터 로드 중 오류 발생: ' + error.message;
+        }
+    };
+
     onMount(() => {
         loadFiles();
+        fetchElasticTitles();
     });
 </script>
 
@@ -77,4 +117,20 @@
             {/if}
         </div>
     </div>
+</div>
+
+<hr class="my-8 w-full border-t-2 border-gray-300" />
+
+<div class="flex flex-col items-center mt-5 w-full max-w-lg px-4">
+    <h2 class="text-xl font-bold mb-4">ElasticSearch Titles</h2>
+    {#if errorMessage}
+        <p class="text-red-500">{errorMessage}</p>
+    {/if}
+    <ul class="space-y-2">
+        {#each elasticTitles as title}
+            <li class="text-gray-700 text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                {title}
+            </li>
+        {/each}
+    </ul>
 </div>

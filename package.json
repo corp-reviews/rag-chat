@@ -29,6 +29,7 @@
 		"@smithy/shared-ini-file-loader": "^3.1.0",
 		"@supabase/supabase-js": "^2.43.4",
 		"aws-sdk": "^2.1632.0",
+		"axios": "^1.7.2",
 		"langchain": "^0.2.4",
 		"openai": "^4.47.1"
 	}
