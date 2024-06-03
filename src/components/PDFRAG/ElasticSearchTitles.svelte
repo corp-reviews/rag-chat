@@ -1,6 +1,6 @@
 <!-- src/components/ElasticSearchTitles.svelte -->
 <script>
-    import { elasticsearchUsername, elasticsearchPassword } from '../stores/env';
+    import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env';
     import axios from 'axios';
     import { onMount } from 'svelte';
     import { writable } from 'svelte/store';

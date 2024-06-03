@@ -1,8 +1,8 @@
 <!-- src/components/PDFRAG.svelte -->
 <script>
-    import FileUpload from './FileUpload.svelte';
-    import FileList from './FileList.svelte';
-    import ElasticSearchTitles from './ElasticSearchTitles.svelte';
+    import FileUpload from '../PDFRAG/FileUpload.svelte';
+    import FileList from '../PDFRAG/FileList.svelte';
+    import ElasticSearchTitles from '../PDFRAG/ElasticSearchTitles.svelte';
 
     let fileListRef;
 

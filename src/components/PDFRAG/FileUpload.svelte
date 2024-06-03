@@ -1,6 +1,6 @@
 <!-- src/components/FileUpload.svelte -->
 <script>
-    import { uploadFileToS3 } from '../lib/s3Upload';
+    import { uploadFileToS3 } from '../../lib/s3Upload';
     import { createEventDispatcher } from 'svelte';
 
     let selectedFiles = [];

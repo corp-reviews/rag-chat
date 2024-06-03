@@ -1,12 +1,12 @@
 <!-- src/components/FileList.svelte -->
 <script>
-    import { listFilesFromS3 } from '../lib/s3ListFiles';
-    import { deleteFileFromS3 } from '../lib/s3DeleteFile';
+    import { listFilesFromS3 } from '../../lib/s3ListFiles';
+    import { deleteFileFromS3 } from '../../lib/s3DeleteFile';
     import { createEventDispatcher, onMount } from 'svelte';
-    import GoToNextFivePagesButton from './pagination/GoToNextFivePagesButton.svelte';
-    import GoToNextPageButton from './pagination/GoToNextPageButton.svelte';
-    import GoToPreviousPageButton from './pagination/GoToPreviousPageButton.svelte';
-    import GoToPreviousFivePagesButton from './pagination/GoToPreviousFivePagesButton.svelte';
+    import GoToNextFivePagesButton from '../pagination/GoToNextFivePagesButton.svelte';
+    import GoToNextPageButton from '../pagination/GoToNextPageButton.svelte';
+    import GoToPreviousPageButton from '../pagination/GoToPreviousPageButton.svelte';
+    import GoToPreviousFivePagesButton from '../pagination/GoToPreviousFivePagesButton.svelte';
 
     let files = [];
     let displayedFiles = [];

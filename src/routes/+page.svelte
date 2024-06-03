@@ -5,7 +5,7 @@
     import Header from '../components/Header.svelte';
     import Divider from '../components/Divider.svelte';
     import DBLoader from '../components/DBLoader.svelte';
-    import PDFRAG from '../components/PDFRAG.svelte';
+    import PDFRAG from '../components/PDFRAG/PDFRAG.svelte';
     import { writable } from 'svelte/store';
 
     let comments = [];
