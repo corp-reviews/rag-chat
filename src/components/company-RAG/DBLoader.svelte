@@ -1,6 +1,6 @@
 <!-- src/components/DBLoader.svelte -->
 <script>
-    import { supabase } from '../lib/supabaseClient';
+    import { supabase } from '../../lib/supabaseClient';
     import { writable } from 'svelte/store';
     export let selectedCorpName;
 

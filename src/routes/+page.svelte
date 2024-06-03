@@ -1,10 +1,10 @@
 <!-- src/routes/+page.svelte -->
 <script>
-    import Chatbox from '../components/Chatbox.svelte';
-    import ChatInput from '../components/ChatInput.svelte';
+    import Chatbox from '../components/chat/Chatbox.svelte';
+    import ChatInput from '../components/chat/ChatInput.svelte';
     import Header from '../components/Header.svelte';
     import Divider from '../components/Divider.svelte';
-    import DBLoader from '../components/DBLoader.svelte';
+    import DBLoader from '../components/company-RAG/DBLoader.svelte';
     import PDFRAG from '../components/PDFRAG/PDFRAG.svelte';
     import { writable } from 'svelte/store';
 
