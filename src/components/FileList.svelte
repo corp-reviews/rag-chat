@@ -5,10 +5,13 @@
     import { createEventDispatcher, onMount } from 'svelte';
 
     let files = [];
+    let isLoading = true;
     const dispatch = createEventDispatcher();
 
     const loadFiles = async () => {
+        isLoading = true;
         files = await listFilesFromS3();
+        isLoading = false;
     };
 
     const handleFileDelete = async (fileName) => {
@@ -30,14 +33,18 @@
 
 <div class="w-2/5 border-r pr-2">
     <h2 class="text-xl font-bold mb-4">Uploaded PDF Files</h2>
-    <ul class="space-y-2">
-        {#each files as file}
-            <li class="flex justify-between items-center text-blue-500 hover:underline cursor-pointer text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
-                <span>{file}</span>
-                <button on:click={() => handleFileDelete(file)} class="text-red-500 hover:text-red-700">
-                    삭제
-                </button>
-            </li>
-        {/each}
-    </ul>
+    {#if isLoading}
+        <p>파일 로딩중...</p>
+    {:else}
+        <ul class="space-y-2">
+            {#each files as file}
+                <li class="flex justify-between items-center text-blue-500 hover:underline cursor-pointer text-sm bg-gray-100 border border-gray-300 rounded px-2 py-1">
+                    <span>{file}</span>
+                    <button on:click={() => handleFileDelete(file)} class="text-red-500 hover:text-red-700">
+                        삭제
+                    </button>
+                </li>
+            {/each}
+        </ul>
+    {/if}
 </div>
