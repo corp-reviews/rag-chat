@@ -25,13 +25,20 @@
     });
 </script>
 
-<div class="text-center mt-4">
+<style>
+    .response-data {
+        max-height: 200px; /* 적절한 높이로 설정 */
+        overflow-y: auto; /* 수직 스크롤 활성화 */
+    }
+</style>
+
+<div class="text-center mt-4 w-full max-w-2xl mx-auto">
     {#if responseList.length > 0}
         <ul class="w-full space-y-2">
             {#each responseList as response (response.file)}
                 <li class="flex flex-col justify-between items-start p-2 border border-gray-300 rounded bg-gray-100 mb-2">
                     <div class="flex justify-between items-center w-full">
-                        <span>{response.file}</span>
+                        <span class="break-words">{response.file}</span>
                         <div>
                             <button type="button" aria-expanded={expanded[response.file]} on:click={() => toggleDetails(response.file)} class="ml-2">
                                 {#if expanded[response.file]} ▼ {:else} ▶ {/if}
@@ -39,7 +46,7 @@
                         </div>
                     </div>
                     {#if expanded[response.file]}
-                        <pre class="bg-gray-200 p-2 rounded mt-2 text-xs overflow-x-auto">{JSON.stringify(response.data, null, 2)}</pre>
+                        <pre class="response-data bg-gray-200 p-2 rounded mt-2 text-xs overflow-x-auto break-words">{JSON.stringify(response.data, null, 2)}</pre>
                     {/if}
                 </li>
             {/each}
