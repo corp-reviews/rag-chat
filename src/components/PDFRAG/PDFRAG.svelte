@@ -1,7 +1,8 @@
-<!-- src/components/PDFRAG.svelte -->
+<!-- src/components/PDFRAG/PDFRAG.svelte -->
 <script>
     import FileList from '../PDFRAG/FileList.svelte';
     import ElasticSearchTitles from '../PDFRAG/ElasticSearchTitles.svelte';
+    import ShowResponse from '../PDFRAG/ShowResponse.svelte';
 
     let fileListRef;
 
@@ -21,6 +22,9 @@
     </div>
     <FileList class="mb-4" bind:this={fileListRef} on:fileDeleted={handleFileAction} />
 </div>
+<hr class="my-8 w-full border-t-2 border-gray-300" />
+
+<ShowResponse />
 
 <hr class="my-8 w-full border-t-2 border-gray-300" />
 
