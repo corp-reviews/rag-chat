@@ -76,7 +76,7 @@
 </script>
 
 <div class="w-full flex flex-col items-center" {...$$restProps}>
-    <FileUpload class="mb-4" on:uploadSuccess={loadFiles} />
+    <FileUpload class="mb-4" on:uploadSuccess={event => dispatch('uploadSuccess', event.detail)} />
     <h2 class="text-xl font-bold mb-4">Uploaded PDF Files</h2>
     {#if isLoading}
         <p>파일 로딩중...</p>
@@ -112,7 +112,8 @@
                         <div class="bg-red-500 text-xs leading-none py-1 text-center text-white" style="width: {deleteProgress}%;">{deleteProgress}%</div>
                     </div>
                 {/if}
-            {/if}
-        </div>
-    {/if}
-</div>
+                {/if}
+                </div>
+                {/if}
+                </div>
+                

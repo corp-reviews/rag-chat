@@ -20,7 +20,7 @@
         if (selectedFiles.length > 0) {
             isUploading = true;
             uploadMessage = '';
-            uploadedFiles.set([]); // Clear the uploaded files list
+            uploadedFiles.set([]); 
             uploadProgress.set(0);
 
             for (let i = 0; i < selectedFiles.length; i++) {
@@ -29,6 +29,25 @@
                 if (result.success) {
                     uploadMessage = `${file.name} 업로드 성공!`;
                     uploadedFiles.update(files => [...files, file]);
+                    
+                    // Convert file to base64
+                    const reader = new FileReader();
+                    reader.onload = async () => {
+                        const base64File = reader.result.split(',')[1];
+                        const response = await fetch('https://asia-northeast3-chat-corp-reviews.cloudfunctions.net/hello-world', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ file: base64File }),
+                        });
+
+                        const data = await response.json();
+                        console.log('Response from function:', data); // 응답 확인 로그 추가
+                        dispatch('uploadSuccess', { file: file.name, data });
+                    };
+                    reader.readAsDataURL(file);
+
                 } else {
                     uploadMessage = `${file.name} 업로드 실패: ${result.message}`;
                 }
@@ -36,11 +55,10 @@
             }
 
             isUploading = false;
-            selectedFiles = []; // Reset the selected files
-            document.querySelector('input[type="file"]').value = ''; // Clear the file input
+            selectedFiles = []; 
+            document.querySelector('input[type="file"]').value = ''; 
             dispatch('uploadSuccess');
 
-            // Clear the upload message and uploaded files list after 2 seconds
             setTimeout(() => {
                 uploadMessage = '';
                 uploadedFiles.set([]);
