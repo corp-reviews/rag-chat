@@ -17,6 +17,7 @@
     }
 
     const handleUploadSuccess = (event) => {
+    if (event.detail && event.detail.file && event.detail.data) {
         const { file, data } = event.detail;
         console.log('Upload Success:', file, data); // 콘솔 로그 추가
         responses.update(currentResponses => {
@@ -24,7 +25,11 @@
             console.log('Updated Responses:', updatedResponses); // 콘솔 로그 추가
             return updatedResponses;
         });
+    } else {
+        console.error('Invalid event detail:', event.detail);
     }
+}
+
 </script>
 
 <div class="flex flex-col items-center mt-5 w-full max-w-2xl px-4">

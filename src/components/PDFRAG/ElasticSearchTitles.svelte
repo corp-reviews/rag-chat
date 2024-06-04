@@ -42,7 +42,7 @@
             if (response.data.hits && response.data.hits.hits) {
                 elasticTitles = response.data.hits.hits.map(hit => ({
                     id: hit._id,
-                    title: hit._source.title ? hit._source.title : 'No Title',
+                    title: `${hit._source.file}-${hit._source.page}-${hit._source.object_number}`,
                     source: hit._source
                 }));
                 totalPages = Math.ceil(elasticTitles.length / titlesPerPage);
