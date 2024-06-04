@@ -14,7 +14,7 @@
 
     onMount(() => {
         responses.subscribe(value => {
-            console.log('Responses Updated in ShowResponse:', value); // 콘솔 로그 추가
+            console.log('Responses Updated in ShowResponse:', value);
             responseList = value;
             value.forEach(response => {
                 if (!(response.file in expanded)) {
@@ -25,13 +25,13 @@
     });
 </script>
 
-<div class="text-center mt-4 w-full max-w-2xl mx-auto">
+<div class="text-center mt-4 w-full max-w-2xl mx-auto max-h-96 overflow-y-auto">
     {#if responseList.length > 0}
         <ul class="w-full space-y-2">
             {#each responseList as response (response.file)}
                 <li class="flex flex-col justify-between items-start p-2 border border-gray-300 rounded bg-gray-100 mb-2">
-                    <div class="flex justify-between items-center w-full">
-                        <span class="break-words">{response.file}</span>
+                    <div class="flex justify-between items-center w-full max-w-full break-words">
+                        <span>{response.file}</span>
                         <div>
                             <button type="button" aria-expanded={expanded[response.file]} on:click={() => toggleDetails(response.file)} class="ml-2">
                                 {#if expanded[response.file]} ▼ {:else} ▶ {/if}
