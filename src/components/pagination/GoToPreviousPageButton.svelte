@@ -2,7 +2,6 @@
 <script>
     export let currentPage;
     export let onPageChange;
-    export let totalPages;
 
     function goToPreviousGroup() {
         onPageChange(Math.max(1, currentPage - 5));
