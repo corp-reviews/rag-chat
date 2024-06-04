@@ -22,7 +22,7 @@
     });
 </script>
 
-<div class="flex-1 overflow-y-auto px-4 py-2 space-y-2 bg-white" bind:this={div}>
+<div class="flex-1 overflow-y-auto px-4 py-2 space-y-2 bg-white" bind:this={div} {...$$restProps}>
     {#if errorMessage}
         <ErrorMessage {errorMessage} />
     {/if}

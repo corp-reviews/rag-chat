@@ -75,7 +75,7 @@
     });
 </script>
 
-<div class="w-full flex flex-col items-center">
+<div class="w-full flex flex-col items-center" {...$$restProps}>
     <FileUpload class="mb-4" on:uploadSuccess={loadFiles} />
     <h2 class="text-xl font-bold mb-4">Uploaded PDF Files</h2>
     {#if isLoading}

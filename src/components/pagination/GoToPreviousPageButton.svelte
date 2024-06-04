@@ -2,6 +2,7 @@
 <script>
     export let currentPage;
     export let onPageChange;
+    export let totalPages;
 
     function goToPreviousGroup() {
         onPageChange(Math.max(1, currentPage - 5));
@@ -14,6 +15,7 @@
     class:text-white={currentPage > 1}
     on:click={goToPreviousGroup}
     disabled={currentPage <= 1}
+    {...$$restProps}
 >
     &lt;&lt;
 </button>

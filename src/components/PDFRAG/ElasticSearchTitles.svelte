@@ -1,4 +1,4 @@
-<!-- src/components/ElasticSearchTitles.svelte -->
+<!-- src/components/PDFRAG/ElasticSearchTitles.svelte -->
 <script>
     import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env';
     import axios from 'axios';

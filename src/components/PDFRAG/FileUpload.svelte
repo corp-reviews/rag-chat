@@ -51,7 +51,7 @@
     };
 </script>
 
-<div class="w-full pl-4">
+<div class="w-full pl-4" {...$$restProps}>
     <input type="file" accept="application/pdf" on:change={handleFileChange} class="mb-4 p-2 border border-gray-300 rounded-md w-full" multiple />
     
     {#if selectedFiles.length > 0}

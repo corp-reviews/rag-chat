@@ -70,7 +70,7 @@
     }
 </script>
 
-<div class="flex items-start mt-2 mb-4 mx-4 bg-gray-100 space-x-2">
+<div class="flex items-start mt-2 mb-4 mx-4 bg-gray-100 space-x-2" {...$$restProps}>
     {#if $selectedOption === 'DBLoader'}
     <div class="w-1/4">
         <label for="corp-name" class="block text-sm font-medium text-gray-700">기업명</label>

@@ -20,6 +20,12 @@ export async function listFilesFromS3() {
     try {
         const command = new ListObjectsV2Command(params);
         const data = await s3Client.send(command);
+
+        if (!data.Contents) {
+            console.error('No contents in the S3 bucket');
+            return [];
+        }
+
         const files = data.Contents.filter(file => file.Key.toLowerCase().endsWith('.pdf')).map(async file => {
             const getObjectCommand = new GetObjectCommand({
                 Bucket: get(bucketName),
