@@ -16,7 +16,7 @@
         }
     }
 
-    const handleUploadSuccess = (event) => {
+    const handleUploadSuccess = async (event) => {
         if (event.detail && event.detail.file && event.detail.data) {
             const { file, data } = event.detail;
             console.log('Upload Success:', file, data); // 콘솔 로그 추가
@@ -25,6 +25,7 @@
                 console.log('Updated Responses:', updatedResponses); // 콘솔 로그 추가
                 return updatedResponses;
             });
+            await handleFileAction(); // 파일 리스트를 새로고침합니다.
         } else {
             console.error('Invalid event detail:', event.detail);
         }

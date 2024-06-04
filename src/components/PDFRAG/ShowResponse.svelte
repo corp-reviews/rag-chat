@@ -25,13 +25,6 @@
     });
 </script>
 
-<style>
-    .response-data {
-        max-height: 200px; /* 적절한 높이로 설정 */
-        overflow-y: auto; /* 수직 스크롤 활성화 */
-    }
-</style>
-
 <div class="text-center mt-4 w-full max-w-2xl mx-auto">
     {#if responseList.length > 0}
         <ul class="w-full space-y-2">
@@ -46,7 +39,7 @@
                         </div>
                     </div>
                     {#if expanded[response.file]}
-                        <pre class="response-data bg-gray-200 p-2 rounded mt-2 text-xs overflow-x-auto break-words">{JSON.stringify(response.data, null, 2)}</pre>
+                        <pre class="max-h-48 overflow-y-auto bg-gray-200 p-2 rounded mt-2 text-xs overflow-x-auto break-words">{JSON.stringify(response.data, null, 2)}</pre>
                     {/if}
                 </li>
             {/each}

@@ -32,11 +32,10 @@
     };
 
     const updateDisplayedFiles = () => {
-    const start = (currentPage - 1) * filesPerPage;
-    const end = start + filesPerPage;
-    displayedFiles = files.slice(start, end);
-};
-
+        const start = (currentPage - 1) * filesPerPage;
+        const end = start + filesPerPage;
+        displayedFiles = files.slice(start, end);
+    };
 
     const handlePageChange = (page) => {
         currentPage = page;
@@ -152,5 +151,3 @@
         </div>
     {/if}
 </div>
-
-       
