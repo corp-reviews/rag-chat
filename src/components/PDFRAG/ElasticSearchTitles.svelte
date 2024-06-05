@@ -7,6 +7,7 @@
     import GoToNextPageButton from '../pagination/GoToNextPageButton.svelte';
     import GoToPreviousPageButton from '../pagination/GoToPreviousPageButton.svelte';
     import GoToPreviousFivePagesButton from '../pagination/GoToPreviousFivePagesButton.svelte';
+    import ProgressBar from '../common/ProgressBar.svelte';
     import { expanded, isLoading, errorMessage, deleteProgress, deleting, currentPage, titlesPerPage, totalPages } from '../../stores/common';
 
     let elasticTitles = [];
@@ -53,7 +54,11 @@
             deleting.set(true);
             deleteProgress.set(0);
             try {
-                await deleteAllElasticTitles(elasticTitles);
+                const totalTitles = elasticTitles.length;
+                for (const [index, title] of elasticTitles.entries()) {
+                    await deleteElasticTitle(title.id);
+                    deleteProgress.set(((index + 1) / totalTitles) * 100);
+                }
                 await loadElasticTitles();
             } catch (error) {
                 console.error('모두 삭제 중 오류 발생: ' + error.message);
@@ -118,9 +123,7 @@
             </button>
         </div>
         {#if $deleting}
-            <div class="w-full bg-gray-200 rounded mt-4">
-                <div class="bg-red-500 text-xs leading-none py-1 text-center text-white" style="width: {$deleteProgress}%;">{$deleteProgress}%</div>
-            </div>
+            <ProgressBar progress={$deleteProgress} />
         {/if}
     {/if}
 </div>

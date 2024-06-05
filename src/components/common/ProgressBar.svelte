@@ -1,7 +1,6 @@
 <!-- src/components/common/ProgressBar.svelte -->
 <script>
-    import { writable } from 'svelte/store';
-    export let progress = writable(0);
+    export let progress = 0;
 </script>
 
 <div class="w-full bg-gray-200 rounded-full h-4">
