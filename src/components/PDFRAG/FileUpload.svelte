@@ -72,8 +72,6 @@
         uploadMessage = '파일을 선택하세요.';
     }
 };
-
-
 </script>
 
 <div class="w-full pl-4" {...$$restProps}>
