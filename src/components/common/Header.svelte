@@ -1,4 +1,4 @@
-<!-- src/components/Header.svelte -->
+<!-- src/components/common/Header.svelte -->
 
 <header class="flex flex-col items-center justify-center bg-white pt-8 pb-8">
     <h1 class="flex-1 text-center text-xl">탐색 증강 생성형 챗봇</h1>

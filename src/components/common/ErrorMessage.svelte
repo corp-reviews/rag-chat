@@ -1,4 +1,4 @@
-<!-- src/components/ErrorMessage.svelte -->
+<!-- src/components/common/ErrorMessage.svelte -->
 <script>
     export let errorMessage;
 </script>

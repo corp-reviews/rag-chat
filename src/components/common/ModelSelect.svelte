@@ -1,4 +1,4 @@
-<!--  -->
+<!-- src/components/common/ModelSelect.svelte -->
 <script>
     export let models = [];
     export let selectedModel = '';

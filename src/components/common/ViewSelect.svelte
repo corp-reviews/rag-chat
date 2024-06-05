@@ -1,4 +1,4 @@
-<!--  -->
+<!-- src/components/common/ViewSelect.svelte -->
 <script>
     import { writable } from 'svelte/store';
 

@@ -1,4 +1,4 @@
-<!--  -->
+<!-- src/components/common/APIKeyInput.svelte -->
 <script>
     export let apiKey = '';
 </script>
