@@ -1,87 +1,47 @@
 <!-- src/components/PDFRAG/ElasticSearchTitles.svelte -->
 <script>
-    import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env';
-    import axios from 'axios';
+    import { fetchElasticTitles, deleteElasticTitle, deleteAllElasticTitles } from '../../lib/elasticsearch';
     import { onMount } from 'svelte';
     import { writable } from 'svelte/store';
     import GoToNextFivePagesButton from '../pagination/GoToNextFivePagesButton.svelte';
     import GoToNextPageButton from '../pagination/GoToNextPageButton.svelte';
     import GoToPreviousPageButton from '../pagination/GoToPreviousPageButton.svelte';
     import GoToPreviousFivePagesButton from '../pagination/GoToPreviousFivePagesButton.svelte';
+    import { expanded, isLoading, errorMessage, deleteProgress, deleting, currentPage, titlesPerPage, totalPages } from '../../stores/common';
 
     let elasticTitles = [];
     let displayedTitles = [];
-    let errorMessage = '';
-    const expanded = writable({});
 
-    let currentPage = 1;
-    const titlesPerPage = 5;
-    let totalPages = 1;
-    let isLoading = true;
+    export let refreshElasticTitles;
 
-    let deleteProgress = 0;
-    let deleting = false;
-
-    export let refreshElasticTitles; // prop으로 받도록 변경
-
-    const fetchElasticTitles = async () => {
-        isLoading = true;
+    const loadElasticTitles = async () => {
+        isLoading.set(true);
         try {
-            const username = $elasticsearchUsername;
-            const password = $elasticsearchPassword;
-            const auth = `Basic ${btoa(`${username}:${password}`)}`;
-
-            const response = await axios.get('https://elasticsearch.corp.reviews:9200/pdf_objects/_search', {
-                params: {
-                    q: '*',
-                    size: 1000 // fetch a large number initially
-                },
-                headers: {
-                    'Authorization': auth
-                }
-            });
-
-            if (response.data.hits && response.data.hits.hits) {
-                elasticTitles = response.data.hits.hits.map(hit => ({
-                    id: hit._id,
-                    title: `${hit._source.file}-${hit._source.page}-${hit._source.object_number}`,
-                    source: hit._source
-                }));
-                totalPages = Math.ceil(elasticTitles.length / titlesPerPage);
-                updateDisplayedTitles();
-            } else {
-                errorMessage = '응답 데이터 구조가 예상과 다릅니다.';
-            }
+            elasticTitles = await fetchElasticTitles();
+            totalPages.set(Math.ceil(elasticTitles.length / titlesPerPage));
+            updateDisplayedTitles();
         } catch (error) {
-            errorMessage = '엘라스틱서치 데이터 로드 중 오류 발생: ' + error.message;
+            errorMessage.set(error.message);
         }
-        isLoading = false;
+        isLoading.set(false);
     };
 
     const updateDisplayedTitles = () => {
-        const start = (currentPage - 1) * titlesPerPage;
+        const start = ($currentPage - 1) * titlesPerPage;
         const end = start + titlesPerPage;
         displayedTitles = elasticTitles.slice(start, end);
     };
 
     const handlePageChange = (page) => {
-        currentPage = page;
+        currentPage.set(page);
         updateDisplayedTitles();
     };
 
     const handleTitleDelete = async (id) => {
         if (confirm('이 항목을 삭제하시겠습니까?')) {
             try {
-                const username = $elasticsearchUsername;
-                const password = $elasticsearchPassword;
-                const auth = `Basic ${btoa(`${username}:${password}`)}`;
-
-                await axios.delete(`https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/${id}`, {
-                    headers: {
-                        'Authorization': auth
-                    }
-                });
-                await fetchElasticTitles();
+                await deleteElasticTitle(id);
+                await loadElasticTitles();
             } catch (error) {
                 console.error('삭제 중 오류 발생: ' + error.message);
             }
@@ -90,27 +50,15 @@
 
     const handleDeleteAllTitles = async () => {
         if (confirm('모든 항목을 삭제하시겠습니까?')) {
-            deleting = true;
-            deleteProgress = 0;
-            const totalTitles = elasticTitles.length;
+            deleting.set(true);
+            deleteProgress.set(0);
             try {
-                const username = $elasticsearchUsername;
-                const password = $elasticsearchPassword;
-                const auth = `Basic ${btoa(`${username}:${password}`)}`;
-
-                for (const [index, title] of elasticTitles.entries()) {
-                    await axios.delete(`https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/${title.id}`, {
-                        headers: {
-                            'Authorization': auth
-                        }
-                    });
-                    deleteProgress = ((index + 1) / totalTitles) * 100;
-                }
-                await fetchElasticTitles();
+                await deleteAllElasticTitles(elasticTitles);
+                await loadElasticTitles();
             } catch (error) {
                 console.error('모두 삭제 중 오류 발생: ' + error.message);
             }
-            deleting = false;
+            deleting.set(false);
         }
     };
 
@@ -122,19 +70,19 @@
     };
 
     onMount(() => {
-        fetchElasticTitles();
+        loadElasticTitles();
         if (typeof refreshElasticTitles === 'function') {
-            refreshElasticTitles(fetchElasticTitles); // fetchElasticTitles 함수를 refreshElasticTitles로 설정
+            refreshElasticTitles(loadElasticTitles);
         }
     });
 </script>
 
 <div class="flex flex-col items-center mt-5 w-full max-w-2xl px-4 overflow-y-auto" style="max-height: 600px;">
     <h2 class="text-xl font-bold mb-4">ElasticSearch Titles</h2>
-    {#if errorMessage}
-        <p class="text-red-500">{errorMessage}</p>
+    {#if $errorMessage}
+        <p class="text-red-500">{$errorMessage}</p>
     {/if}
-    {#if isLoading}
+    {#if $isLoading}
         <p>로딩 중...</p>
     {:else if displayedTitles.length === 0}
         <p>표시할 제목이 없습니다.</p>
@@ -160,7 +108,7 @@
         <div class="flex justify-center mt-4">
             <GoToPreviousFivePagesButton {currentPage} onPageChange={handlePageChange} />
             <GoToPreviousPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-            <span class="px-2 py-1">{currentPage} / {totalPages}</span>
+            <span class="px-2 py-1">{$currentPage} / {$totalPages}</span>
             <GoToNextPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
             <GoToNextFivePagesButton {currentPage} onPageChange={handlePageChange} {totalPages} />
         </div>
@@ -169,9 +117,9 @@
                 모두 삭제
             </button>
         </div>
-        {#if deleting}
+        {#if $deleting}
             <div class="w-full bg-gray-200 rounded mt-4">
-                <div class="bg-red-500 text-xs leading-none py-1 text-center text-white" style="width: {deleteProgress}%;">{deleteProgress}%</div>
+                <div class="bg-red-500 text-xs leading-none py-1 text-center text-white" style="width: {$deleteProgress}%;">{$deleteProgress}%</div>
             </div>
         {/if}
     {/if}
