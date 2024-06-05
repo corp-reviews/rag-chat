@@ -7,6 +7,7 @@
 
     let fileListRef;
     let responses = writable([]);
+    let refreshElasticTitles;
 
     const handleFileAction = async () => {
         if (fileListRef && typeof fileListRef.loadFiles === 'function') {
@@ -19,10 +20,10 @@
     const handleUploadSuccess = async (event) => {
         if (event.detail && event.detail.file && event.detail.data) {
             const { file, data } = event.detail;
-            console.log('Upload Success:', file, data); // 콘솔 로그 추가
+            console.log('Upload Success:', file, data);
             responses.update(currentResponses => {
                 const updatedResponses = [...currentResponses, { file, data }];
-                console.log('Updated Responses:', updatedResponses); // 콘솔 로그 추가
+                console.log('Updated Responses:', updatedResponses);
                 return updatedResponses;
             });
             await handleFileAction(); // 파일 리스트를 새로고침합니다.
@@ -30,6 +31,10 @@
             console.error('Invalid event detail:', event.detail);
         }
     }
+
+    const setRefreshElasticTitles = (refreshFunc) => {
+        refreshElasticTitles = refreshFunc;
+    };
 </script>
 
 <div class="flex flex-col min-h-screen">
@@ -43,11 +48,11 @@
     <hr class="my-8 w-full border-t-2 border-gray-300" />
 
     <div class="h-1/3 overflow-y-auto w-full max-w-2xl px-4">
-        <ShowResponse {responses} />
+        <ShowResponse {responses} {refreshElasticTitles} />
     </div>
     <hr class="my-8 w-full border-t-2 border-gray-300" />
 
     <div class="h-1/3 overflow-y-auto w-full max-w-2xl px-4">
-        <ElasticSearchTitles />
+        <ElasticSearchTitles {setRefreshElasticTitles} />
     </div>
 </div>

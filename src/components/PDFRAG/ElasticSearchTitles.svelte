@@ -22,6 +22,8 @@
     let deleteProgress = 0;
     let deleting = false;
 
+    export let refreshElasticTitles; // prop으로 받도록 변경
+
     const fetchElasticTitles = async () => {
         isLoading = true;
         try {
@@ -121,6 +123,9 @@
 
     onMount(() => {
         fetchElasticTitles();
+        if (typeof refreshElasticTitles === 'function') {
+            refreshElasticTitles(fetchElasticTitles); // fetchElasticTitles 함수를 refreshElasticTitles로 설정
+        }
     });
 </script>
 
