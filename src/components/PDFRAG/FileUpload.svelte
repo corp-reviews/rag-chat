@@ -1,6 +1,6 @@
 <!-- src/components/FileUpload.svelte -->
 <script>
-    import { uploadFileToS3 } from '../../lib/s3Upload';
+    import { uploadFileToS3 } from '../../lib/s3';
     import { createEventDispatcher } from 'svelte';
     import { writable } from 'svelte/store';
 

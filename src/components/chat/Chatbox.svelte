@@ -1,7 +1,7 @@
 <!-- src/components/Chatbox.svelte -->
 <script>
     import { beforeUpdate, afterUpdate } from 'svelte';
-    import ErrorMessage from "../ErrorMessage.svelte";
+    import ErrorMessage from "../common/ErrorMessage.svelte";
     export let comments;
     export let errorMessage;
 
