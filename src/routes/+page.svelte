@@ -25,6 +25,12 @@
     const removeTypingIndicator = () => (comments = comments.filter(comment => comment.text !== '...'));
     const setError = (message) => (errorMessage = message);
     const handleModelChange = (event) => (selectedModel = event.target.value);
+
+    let refreshElasticTitles;  // 이 줄을 추가
+
+    const setRefreshElasticTitles = (func) => {
+        refreshElasticTitles = func;
+    };
 </script>
 
 <div class="flex h-screen bg-gray-100">
@@ -35,7 +41,7 @@
         {#if $selectedOption === 'DBLoader'}
             <DBLoader bind:selectedCorpName />
         {:else}
-            <PDFRAG />
+            <PDFRAG {refreshElasticTitles} {setRefreshElasticTitles} />
         {/if}
     </div>
     <div class="flex-1 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden">

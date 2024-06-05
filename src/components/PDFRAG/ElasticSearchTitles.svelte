@@ -13,7 +13,7 @@
     let elasticTitles = [];
     let displayedTitles = [];
 
-    export let refreshElasticTitles;
+    export let setRefreshElasticTitles; // 추가된 부분
 
     const loadElasticTitles = async () => {
         isLoading.set(true);
@@ -76,8 +76,8 @@
 
     onMount(() => {
         loadElasticTitles();
-        if (typeof refreshElasticTitles === 'function') {
-            refreshElasticTitles(loadElasticTitles);
+        if (typeof setRefreshElasticTitles === 'function') {
+            setRefreshElasticTitles(loadElasticTitles); // loadElasticTitles 함수를 setRefreshElasticTitles로 설정
         }
     });
 </script>

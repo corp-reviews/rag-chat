@@ -12,6 +12,8 @@
     let uploadMessage = '';
     let isUploading = false;
 
+    export let refreshElasticTitles;  // Prop으로 받기
+
     const dispatch = createEventDispatcher();
 
     const handleFileChange = (event) => {
@@ -60,6 +62,11 @@
                 uploadMessage = '';
                 uploadedFiles.set([]);
             }, 2000);
+
+            // 파일 업로드가 완료되면 ElasticSearch Titles를 리프레시
+            if (typeof refreshElasticTitles === 'function') {
+                refreshElasticTitles();
+            }
         } else {
             uploadMessage = '파일을 선택하세요.';
         }
