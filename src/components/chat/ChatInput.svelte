@@ -1,6 +1,7 @@
 <!-- src/components/ChatInput.svelte -->
 <script>
     import { get } from 'svelte/store';
+    import { fetchData } from '../../lib/fetchHelper';
     export let apiKey;
     export let addComment;
     export let removeTypingIndicator;
@@ -24,11 +25,7 @@
             return;
         }
 
-        const comment = {
-            author: 'user',
-            text: message
-        };
-
+        const comment = { author: 'user', text: message };
         message = '';
         addComment(comment);
         setError('');
@@ -37,7 +34,7 @@
         addComment(typingComment);
 
         const corpName = get(selectedCorpName);
-        const reply = await getLangchainResponse(comment.text, corpName);
+        const reply = await fetchData('/api/chat', 'POST', { userInput: comment.text, apiKey, selectedModel, corpName });
 
         if (reply.error) {
             setError(reply.error);
@@ -45,27 +42,6 @@
             reply.model = selectedModel;
             removeTypingIndicator();
             addComment(reply);
-        }
-    }
-
-    async function getLangchainResponse(userInput, corpName) {
-        try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ userInput, apiKey, selectedModel, corpName }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                return { author: 'gpt', text: data.text };
-            } else {
-                throw new Error(data.error);
-            }
-        } catch (error) {
-            console.error('Error getting GPT response:', error);
-            return { error: error.message };
         }
     }
 </script>

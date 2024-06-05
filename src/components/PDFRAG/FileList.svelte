@@ -1,13 +1,13 @@
 <!-- src/components/FileList.svelte -->
 <script>
     import { listFilesFromS3, deleteFileFromS3 } from '../../lib/s3';
+    import { fetchData } from '../../lib/fetchHelper';
     import { createEventDispatcher, onMount } from 'svelte';
     import GoToNextFivePagesButton from '../pagination/GoToNextFivePagesButton.svelte';
     import GoToNextPageButton from '../pagination/GoToNextPageButton.svelte';
     import GoToPreviousPageButton from '../pagination/GoToPreviousPageButton.svelte';
     import GoToPreviousFivePagesButton from '../pagination/GoToPreviousFivePagesButton.svelte';
     import FileUpload from '../PDFRAG/FileUpload.svelte';
-    import axios from 'axios';
     import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env';
 
     let files = [];
@@ -42,32 +42,22 @@
     };
 
     const deleteElasticIndexes = async (fileName) => {
-        try {
-            const username = $elasticsearchUsername;
-            const password = $elasticsearchPassword;
-            const auth = `Basic ${btoa(`${username}:${password}`)}`;
+        const username = elasticsearchUsername;
+        const password = elasticsearchPassword;
+        const auth = `Basic ${btoa(`${username}:${password}`)}`;
 
-            const response = await axios.get('https://elasticsearch.corp.reviews:9200/pdf_objects/_search', {
-                params: {
-                    q: `file:${fileName}`,
-                    size: 1000 // fetch a large number initially
-                },
-                headers: {
+        const response = await fetchData('https://elasticsearch.corp.reviews:9200/pdf_objects/_search', 'GET', null, {
+            'Authorization': auth,
+            'q': `file:${fileName}`,
+            'size': 1000
+        });
+
+        if (response.hits && response.hits.hits) {
+            for (const hit of response.hits.hits) {
+                await fetchData(`https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/${hit._id}`, 'DELETE', null, {
                     'Authorization': auth
-                }
-            });
-
-            if (response.data.hits && response.data.hits.hits) {
-                for (const hit of response.data.hits.hits) {
-                    await axios.delete(`https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/${hit._id}`, {
-                        headers: {
-                            'Authorization': auth
-                        }
-                    });
-                }
+                });
             }
-        } catch (error) {
-            console.error('ElasticSearch 인덱스 삭제 중 오류 발생: ' + error.message);
         }
     };
 
@@ -75,8 +65,8 @@
         if (confirm('업로드한 파일을 삭제하시겠습니까?')) {
             const result = await deleteFileFromS3(fileName);
             if (result.success) {
-                await deleteElasticIndexes(fileName); // Delete related ElasticSearch indexes
-                await loadFiles(); // Reload files after delete
+                await deleteElasticIndexes(fileName);
+                await loadFiles();
                 dispatch('fileDeleted');
             } else {
                 console.error(`파일 삭제 실패: ${result.message}`);
@@ -92,13 +82,13 @@
             for (const [index, file] of files.entries()) {
                 const result = await deleteFileFromS3(file.name);
                 if (result.success) {
-                    await deleteElasticIndexes(file.name); // Delete related ElasticSearch indexes
+                    await deleteElasticIndexes(file.name);
                 } else {
                     console.error(`파일 삭제 실패: ${result.message}`);
                 }
                 deleteProgress = ((index + 1) / totalFiles) * 100;
             }
-            await loadFiles(); // Reload files after deleting all
+            await loadFiles();
             deleting = false;
             dispatch('allFilesDeleted');
         }
