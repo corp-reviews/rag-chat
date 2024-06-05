@@ -8,6 +8,9 @@ node_modules
 !.env.example
 .npmrc
 vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
 *.sh
 /log
+vite.config.js
+.hidden/
+fullchain.pem
+privkey.pem
