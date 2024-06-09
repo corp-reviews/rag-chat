@@ -3,137 +3,89 @@
     import { writable } from 'svelte/store';
     import { onMount } from 'svelte';
     import axios from 'axios';
-    import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env'; // 인증 정보 가져오기
+    import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env';
 
     export let responses = writable([]);
-    export let refreshElasticTitles; // ElasticSearchTitles 새로고침 함수
+    export let refreshElasticTitles;
 
-    let responseList = [];
-    let expanded = {};
-    let posting = writable(false); // POST 상태 관리
-
-    let username, password;
+    let responseList = [], expanded = {}, username, password;
+    const posting = writable(false);
 
     elasticsearchUsername.subscribe(value => username = value);
     elasticsearchPassword.subscribe(value => password = value);
 
-    const toggleDetails = (file) => {
-        expanded = { ...expanded, [file]: !expanded[file] };
-    };
-
-    onMount(() => {
-        responses.subscribe(value => {
-            console.log('Responses Updated in ShowResponse:', value);
-            responseList = value.map(groupParagraphs);
-            value.forEach(response => {
-                if (!(response.file in expanded)) {
-                    expanded = { ...expanded, [response.file]: false };
-                }
-            });
-        });
-    });
+    const toggleDetails = (file) => expanded = { ...expanded, [file]: !expanded[file] };
 
     const groupParagraphs = (response) => {
-        console.log('groupParagraphs 함수 호출:', response); // 함수 호출 확인
-        if (!response.data || !Array.isArray(response.data.pages)) {
-            console.log('Invalid response data:', response.data); // 데이터 유효성 확인
-            return response;
-        }
+        if (!response.data?.pages) return response;
 
-        const groupedData = [];
+        const groupedData = [], currentParagraph = [];
+        response.data.pages.forEach(page => {
+            if (!page.objects) return;
 
-        for (const page of response.data.pages) {
-            if (!page.objects || !Array.isArray(page.objects)) {
-                console.log('Invalid page data:', page); // 페이지 데이터 유효성 확인
-                continue;
-            }
-            let currentParagraph = [];
-            for (const item of page.objects) {
+            page.objects.forEach(item => {
                 if (item.bbox) {
                     if (currentParagraph.length === 0 || item.bbox.top === currentParagraph[0].bbox.top) {
                         currentParagraph.push(item);
                     } else {
-                        groupedData.push({
-                            file: response.file,
-                            page: page.page,
-                            type: currentParagraph[0].Type,
-                            index: groupedData.length + 1,
-                            text: currentParagraph.map(i => i.Text).join(' '),
-                            bbox: currentParagraph[0].bbox
-                        });
-                        currentParagraph = [item];
+                        groupedData.push(createParagraph(response, page, currentParagraph));
+                        currentParagraph.length = 0;
+                        currentParagraph.push(item);
                     }
                 } else {
-                    if (currentParagraph.length > 0) {
-                        groupedData.push({
-                            file: response.file,
-                            page: page.page,
-                            type: currentParagraph[0].Type,
-                            index: groupedData.length + 1,
-                            text: currentParagraph.map(i => i.Text).join(' '),
-                            bbox: currentParagraph[0].bbox
-                        });
-                        currentParagraph = [];
-                    }
-                    groupedData.push({
-                        file: response.file,
-                        page: page.page,
-                        type: item.Type,
-                        index: groupedData.length + 1,
-                        text: item.Text,
-                        bbox: item.bbox
-                    });
+                    if (currentParagraph.length > 0) groupedData.push(createParagraph(response, page, currentParagraph));
+                    groupedData.push(createItem(response, page, item));
+                    currentParagraph.length = 0;
                 }
-            }
-            if (currentParagraph.length > 0) {
-                groupedData.push({
-                    file: response.file,
-                    page: page.page,
-                    type: currentParagraph[0].Type,
-                    index: groupedData.length + 1,
-                    text: currentParagraph.map(i => i.Text).join(' '),
-                    bbox: currentParagraph[0].bbox
-                });
-                currentParagraph = [];
-            }
-        }
+            });
+            if (currentParagraph.length > 0) groupedData.push(createParagraph(response, page, currentParagraph));
+        });
 
-        console.log('Grouped Data to be POSTed:', groupedData); // groupedData 콘솔에 표시
         postGroupedDataToElasticsearch(groupedData);
-
         return { ...response, data: groupedData };
     };
+
+    const createParagraph = (response, page, currentParagraph) => ({
+        file: response.file,
+        page: page.page,
+        type: currentParagraph[0].Type,
+        index: response.data.length + 1,
+        text: currentParagraph.map(i => i.Text).join(' '),
+        bbox: currentParagraph[0].bbox
+    });
+
+    const createItem = (response, page, item) => ({
+        file: response.file,
+        page: page.page,
+        type: item.Type,
+        index: response.data.length + 1,
+        text: item.Text,
+        bbox: item.bbox
+    });
 
     const postGroupedDataToElasticsearch = async (groupedData) => {
         posting.set(true);
         try {
             const auth = `Basic ${btoa(`${username}:${password}`)}`;
-            for (const item of groupedData) {
-                const document = {
-                    file: item.file,
-                    page: item.page,
-                    type: item.type,
-                    index: item.index,
-                    text: item.text,
-                    bbox: item.bbox
-                };
-                const response = await axios.post('https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/', document, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': auth
-                    }
-                });
-                console.log('Elasticsearch POST 성공:', response.data);
-            }
-            if (refreshElasticTitles) {
-                refreshElasticTitles(); // ElasticSearchTitles 새로고침
-            }
+            await Promise.all(groupedData.map(item => axios.post(
+                'https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/',
+                item,
+                { headers: { 'Content-Type': 'application/json', 'Authorization': auth } }
+            )));
+            if (refreshElasticTitles) refreshElasticTitles();
         } catch (error) {
             console.error('Elasticsearch POST 실패:', error);
         } finally {
             posting.set(false);
         }
     };
+
+    onMount(() => {
+        responses.subscribe(value => {
+            responseList = value.map(groupParagraphs);
+            value.forEach(response => expanded[response.file] ??= false);
+        });
+    });
 </script>
 
 <div class="mt-4 w-full max-w-2xl mx-auto max-h-96 overflow-y-auto">
@@ -146,11 +98,9 @@
                 <li class="flex flex-col justify-between items-start p-2 border border-gray-300 rounded bg-gray-100 mb-2">
                     <div class="flex justify-between items-center w-full break-words">
                         <span>{response.file}</span>
-                        <div>
-                            <button type="button" aria-expanded={expanded[response.file]} on:click={() => toggleDetails(response.file)} class="ml-2">
-                                {#if expanded[response.file]} ▼ {:else} ▶ {/if}
-                            </button>
-                        </div>
+                        <button type="button" aria-expanded={expanded[response.file]} on:click={() => toggleDetails(response.file)} class="ml-2">
+                            {#if expanded[response.file]} ▼ {:else} ▶ {/if}
+                        </button>
                     </div>
                     {#if expanded[response.file]}
                         <pre class="max-h-48 overflow-y-auto bg-gray-200 p-2 rounded mt-2 text-xs overflow-x-scroll break-words">

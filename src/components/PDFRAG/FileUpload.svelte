@@ -9,67 +9,62 @@
 
     let selectedFiles = [];
     let uploadedFiles = writable([]);
-    let uploadMessage = '';
-    let isUploading = false;
+    let uploadMessage = '', isUploading = false;
 
-    export let refreshElasticTitles;  // Prop으로 받기
-
+    export let refreshElasticTitles;
     const dispatch = createEventDispatcher();
 
-    const handleFileChange = (event) => {
-        selectedFiles = Array.from(event.target.files);
-    };
+    const handleFileChange = (event) => selectedFiles = Array.from(event.target.files);
 
     const handleFileUpload = async () => {
-        if (selectedFiles.length > 0) {
-            isUploading = true;
+        if (!selectedFiles.length) {
+            uploadMessage = '파일을 선택하세요.';
+            return;
+        }
+
+        isUploading = true;
+        uploadMessage = '';
+        uploadedFiles.set([]);
+        uploadProgress.set(0);
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+            const file = selectedFiles[i];
+            const result = await uploadFileToS3(file);
+
+            if (result.success) {
+                uploadMessage = `${file.name} 업로드 성공!`;
+                uploadedFiles.update(files => [...files, file]);
+
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const base64File = reader.result.split(',')[1];
+                    const response = await fetchData('https://asia-northeast3-chat-corp-reviews.cloudfunctions.net/hello-world', 'POST', { file: base64File, filename: file.name });
+
+                    if (response.error) {
+                        console.error('Error uploading to Google Cloud Function:', response.error);
+                        dispatch('uploadSuccess', { file: file.name, data: { error: response.error } });
+                    } else {
+                        console.log('Response from function:', response);
+                        dispatch('uploadSuccess', { file: file.name, data: response });
+                    }
+                };
+                reader.readAsDataURL(file);
+            } else {
+                uploadMessage = `${file.name} 업로드 실패: ${result.message}`;
+            }
+            uploadProgress.set(((i + 1) / selectedFiles.length) * 100);
+        }
+
+        isUploading = false;
+        selectedFiles = [];
+        document.querySelector('input[type="file"]').value = '';
+
+        setTimeout(() => {
             uploadMessage = '';
             uploadedFiles.set([]);
-            uploadProgress.set(0);
+        }, 2000);
 
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const file = selectedFiles[i];
-                const result = await uploadFileToS3(file);
-                if (result.success) {
-                    uploadMessage = `${file.name} 업로드 성공!`;
-                    uploadedFiles.update(files => [...files, file]);
-
-                    const reader = new FileReader();
-                    reader.onload = async () => {
-                        const base64File = reader.result.split(',')[1];
-                        const response = await fetchData('https://asia-northeast3-chat-corp-reviews.cloudfunctions.net/hello-world', 'POST', { file: base64File, filename: file.name });
-
-                        if (response.error) {
-                            console.error('Error uploading to Google Cloud Function:', response.error);
-                            dispatch('uploadSuccess', { file: file.name, data: { error: response.error } });
-                        } else {
-                            console.log('Response from function:', response);
-                            dispatch('uploadSuccess', { file: file.name, data: response });
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    uploadMessage = `${file.name} 업로드 실패: ${result.message}`;
-                }
-                uploadProgress.set(((i + 1) / selectedFiles.length) * 100);
-            }
-
-            isUploading = false;
-            selectedFiles = [];
-            document.querySelector('input[type="file"]').value = '';
-
-            setTimeout(() => {
-                uploadMessage = '';
-                uploadedFiles.set([]);
-            }, 2000);
-
-            // 파일 업로드가 완료되면 ElasticSearch Titles를 리프레시
-            if (typeof refreshElasticTitles === 'function') {
-                refreshElasticTitles();
-            }
-        } else {
-            uploadMessage = '파일을 선택하세요.';
-        }
+        if (typeof refreshElasticTitles === 'function') refreshElasticTitles();
     };
 </script>
 
@@ -86,8 +81,7 @@
             </ul>
         </div>
         <button on:click={handleFileUpload} class="p-2 bg-blue-600 text-white rounded-md w-full" disabled={isUploading} class:opacity-50={isUploading}>
-            {#if isUploading}업로드 중...{/if}
-            {#if !isUploading}업로드{/if}
+            {isUploading ? '업로드 중...' : '업로드'}
         </button>
     {/if}
 

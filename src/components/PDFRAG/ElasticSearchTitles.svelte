@@ -4,10 +4,11 @@
     import { onMount } from 'svelte';
     import Pagination from '../pagination/Pagination.svelte';
     import ProgressBar from '../common/ProgressBar.svelte';
-    import { expanded, isLoading, errorMessage, deleteProgress, deleting, currentPage, titlesPerPage, totalPages } from '../../stores/common';
+    import { writable } from 'svelte/store';
+    import { expanded, isLoading, errorMessage, deleteProgress, deleting } from '../../stores/common';
 
-    let elasticTitles = [];
-    let displayedTitles = [];
+    let elasticTitles = [], displayedTitles = [];
+    let currentPage = writable(1), titlesPerPage = 10, totalPages = writable(0);
 
     export let setRefreshElasticTitles;
 
@@ -25,8 +26,7 @@
 
     const updateDisplayedTitles = () => {
         const start = ($currentPage - 1) * titlesPerPage;
-        const end = start + titlesPerPage;
-        displayedTitles = elasticTitles.slice(start, end);
+        displayedTitles = elasticTitles.slice(start, start + titlesPerPage);
     };
 
     const handlePageChange = (page) => {
@@ -50,10 +50,9 @@
             deleting.set(true);
             deleteProgress.set(0);
             try {
-                const totalTitles = elasticTitles.length;
                 for (const [index, title] of elasticTitles.entries()) {
                     await deleteElasticTitle(title.id);
-                    deleteProgress.set(((index + 1) / totalTitles) * 100);
+                    deleteProgress.set(((index + 1) / elasticTitles.length) * 100);
                 }
                 await loadElasticTitles();
             } catch (error) {
@@ -64,17 +63,12 @@
     };
 
     const toggleDetails = (id) => {
-        expanded.update(current => ({
-            ...current,
-            [id]: !current[id]
-        }));
+        expanded.update(current => ({ ...current, [id]: !current[id] }));
     };
 
     onMount(() => {
         loadElasticTitles();
-        if (typeof setRefreshElasticTitles === 'function') {
-            setRefreshElasticTitles(loadElasticTitles);
-        }
+        if (typeof setRefreshElasticTitles === 'function') setRefreshElasticTitles(loadElasticTitles);
     });
 </script>
 
@@ -106,11 +100,9 @@
                 </li>
             {/each}
         </ul>
-        <Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
+        <Pagination bind:currentPage={$currentPage} bind:totalPages={$totalPages} onPageChange={handlePageChange} />
         <div class="flex justify-center mt-4">
-            <button on:click={handleDeleteAllTitles} class="text-red-500 hover:text-red-700">
-                모두 삭제
-            </button>
+            <button on:click={handleDeleteAllTitles} class="text-red-500 hover:text-red-700">모두 삭제</button>
         </div>
         {#if $deleting}
             <ProgressBar progress={$deleteProgress} />
