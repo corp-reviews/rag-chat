@@ -50,7 +50,11 @@
         const similarDocuments = await searchSimilarDocuments(vector);
         console.log('Top 3 similar documents:', similarDocuments); // 상위 3개 유사한 문서 결과를 콘솔에 출력
 
-        const reply = await fetchData('/api/chat', 'POST', { userInput: comment.text, apiKey, selectedModel, corpName });
+        // 시스템 메시지 생성
+        const systemMessage = similarDocuments.map(doc => doc.source.text).join('\n\n');
+        
+        // OpenAI API 요청
+        const reply = await fetchData('/api/chat', 'POST', { userInput: comment.text, apiKey, selectedModel, corpName, systemMessage });
 
         if (reply.error) {
             setError(reply.error);

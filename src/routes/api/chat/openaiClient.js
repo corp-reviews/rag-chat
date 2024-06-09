@@ -1,6 +1,5 @@
 // src/routes/api/chat/openaiClient.js
 import { ChatOpenAI } from "@langchain/openai";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
 /**
@@ -17,15 +16,17 @@ export function createLangchainClient(apiKey, model) {
 }
 
 /**
- * Sends a message to Langchain ChatOpenAI and returns the response.
+ * Sends a series of messages to Langchain ChatOpenAI and returns the response.
  * @param {ChatOpenAI} client - The ChatOpenAI client instance.
- * @param {string} userInput - The user input to send to OpenAI.
+ * @param {Array} messages - The messages to send to OpenAI.
  * @returns {Promise<string>} - The response from ChatOpenAI.
  */
-export async function getLangchainResponse(client, userInput) {
-    const messages = [new HumanMessage(userInput)];
+export async function getLangchainResponse(client, messages) {
+    if (!Array.isArray(messages)) {
+        throw new Error("messages must be an array");
+    }
+    
     const parser = new StringOutputParser();
-
     const chain = client.pipe(parser);
     const response = await chain.invoke(messages);
 
