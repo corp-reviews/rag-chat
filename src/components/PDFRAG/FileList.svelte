@@ -3,10 +3,7 @@
     import { listFilesFromS3, deleteFileFromS3 } from '../../lib/s3';
     import { fetchData } from '../../lib/fetchHelper';
     import { createEventDispatcher, onMount } from 'svelte';
-    import GoToNextFivePagesButton from '../pagination/GoToNextFivePagesButton.svelte';
-    import GoToNextPageButton from '../pagination/GoToNextPageButton.svelte';
-    import GoToPreviousPageButton from '../pagination/GoToPreviousPageButton.svelte';
-    import GoToPreviousFivePagesButton from '../pagination/GoToPreviousFivePagesButton.svelte';
+    import Pagination from '../pagination/Pagination.svelte';
     import FileUpload from '../PDFRAG/FileUpload.svelte';
     import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env';
 
@@ -119,13 +116,7 @@
                 {/each}
             </ul>
             {#if files.length > 0}
-                <div class="flex justify-center mt-4">
-                    <GoToPreviousFivePagesButton {currentPage} onPageChange={handlePageChange} />
-                    <GoToPreviousPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-                    <span class="px-2 py-1">{currentPage} / {totalPages}</span>
-                    <GoToNextPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-                    <GoToNextFivePagesButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-                </div>
+                <Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
                 <div class="flex justify-center mt-4">
                     <button on:click={handleDeleteAllFiles} class="text-red-500 hover:text-red-700">
                         모두 삭제

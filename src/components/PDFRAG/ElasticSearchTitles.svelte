@@ -2,18 +2,14 @@
 <script>
     import { fetchElasticTitles, deleteElasticTitle, deleteAllElasticTitles } from '../../lib/elasticsearch';
     import { onMount } from 'svelte';
-    import { writable } from 'svelte/store';
-    import GoToNextFivePagesButton from '../pagination/GoToNextFivePagesButton.svelte';
-    import GoToNextPageButton from '../pagination/GoToNextPageButton.svelte';
-    import GoToPreviousPageButton from '../pagination/GoToPreviousPageButton.svelte';
-    import GoToPreviousFivePagesButton from '../pagination/GoToPreviousFivePagesButton.svelte';
+    import Pagination from '../pagination/Pagination.svelte';
     import ProgressBar from '../common/ProgressBar.svelte';
     import { expanded, isLoading, errorMessage, deleteProgress, deleting, currentPage, titlesPerPage, totalPages } from '../../stores/common';
 
     let elasticTitles = [];
     let displayedTitles = [];
 
-    export let setRefreshElasticTitles; // 추가된 부분
+    export let setRefreshElasticTitles;
 
     const loadElasticTitles = async () => {
         isLoading.set(true);
@@ -77,7 +73,7 @@
     onMount(() => {
         loadElasticTitles();
         if (typeof setRefreshElasticTitles === 'function') {
-            setRefreshElasticTitles(loadElasticTitles); // loadElasticTitles 함수를 setRefreshElasticTitles로 설정
+            setRefreshElasticTitles(loadElasticTitles);
         }
     });
 </script>
@@ -110,13 +106,7 @@
                 </li>
             {/each}
         </ul>
-        <div class="flex justify-center mt-4">
-            <GoToPreviousFivePagesButton {currentPage} onPageChange={handlePageChange} />
-            <GoToPreviousPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-            <span class="px-2 py-1">{$currentPage} / {$totalPages}</span>
-            <GoToNextPageButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-            <GoToNextFivePagesButton {currentPage} onPageChange={handlePageChange} {totalPages} />
-        </div>
+        <Pagination {currentPage} {totalPages} onPageChange={handlePageChange} />
         <div class="flex justify-center mt-4">
             <button on:click={handleDeleteAllTitles} class="text-red-500 hover:text-red-700">
                 모두 삭제
