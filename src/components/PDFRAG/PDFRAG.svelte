@@ -8,6 +8,7 @@
     let fileListRef;
     let responses = writable([]);
     let refreshElasticTitles;
+    let showRefreshButton = writable(false); // Add this state
 
     const handleFileAction = async () => {
         if (fileListRef && typeof fileListRef.loadFiles === 'function') {
@@ -27,11 +28,18 @@
                 return updatedResponses;
             });
             await handleFileAction(); // 파일 리스트를 새로고침합니다.
-            if (refreshElasticTitles) {
-                refreshElasticTitles(); // ElasticSearchTitles 새로고침
-            }
+            showRefreshButton.set(true); // Show the refresh button
         } else {
             console.error('Invalid event detail:', event.detail);
+        }
+    };
+
+    const handleRefresh = async () => {
+        if (refreshElasticTitles) {
+            console.log("Calling refreshElasticTitles function...");
+            await refreshElasticTitles();
+            console.log("refreshElasticTitles function called successfully.");
+            showRefreshButton.set(false); // Hide the refresh button after refresh
         }
     };
 
@@ -57,5 +65,8 @@
 
     <div class="h-1/3 overflow-y-auto w-full max-w-2xl px-4">
         <ElasticSearchTitles {setRefreshElasticTitles} />
+        {#if $showRefreshButton}
+            <button class="mt-4 p-2 bg-blue-600 text-white rounded-md" on:click={handleRefresh}>새로고침</button>
+        {/if}
     </div>
 </div>

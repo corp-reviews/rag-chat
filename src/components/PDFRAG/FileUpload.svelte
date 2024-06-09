@@ -1,4 +1,4 @@
-<!-- src/components/FileUpload.svelte -->
+<!-- src/components/PDFRAG/FileUpload.svelte -->
 <script>
     import { uploadFileToS3 } from '../../lib/s3';
     import { createEventDispatcher } from 'svelte';
@@ -11,7 +11,8 @@
     let uploadedFiles = writable([]);
     let uploadMessage = '', isUploading = false;
 
-    export let refreshElasticTitles;
+    export let refreshElasticTitles; // Ensure this prop is received
+
     const dispatch = createEventDispatcher();
 
     const handleFileChange = (event) => selectedFiles = Array.from(event.target.files);
@@ -64,7 +65,9 @@
             uploadedFiles.set([]);
         }, 2000);
 
-        if (typeof refreshElasticTitles === 'function') refreshElasticTitles();
+        if (typeof refreshElasticTitles === 'function') {
+            await refreshElasticTitles(); // Ensure the refresh is awaited
+        }
     };
 </script>
 
