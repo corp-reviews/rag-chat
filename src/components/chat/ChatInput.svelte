@@ -2,6 +2,9 @@
 <script>
     import { get } from 'svelte/store';
     import { fetchData } from '../../lib/fetchHelper';
+    import { vectorizeText } from '../../lib/vectorize';
+    import { searchSimilarDocuments } from '../../lib/elasticsearch';
+
     export let apiKey;
     export let addComment;
     export let removeTypingIndicator;
@@ -34,6 +37,19 @@
         addComment(typingComment);
 
         const corpName = get(selectedCorpName);
+
+        // 사용자 입력 메시지를 벡터화 시도
+        const vector = await vectorizeText(comment.text);
+        if (!vector) {
+            setError('Failed to vectorize the message');
+            return;
+        }
+        console.log('Vectorized message:', vector); // 벡터화 결과를 콘솔에 출력
+
+        // Elasticsearch에서 유사한 문서 검색
+        const similarDocuments = await searchSimilarDocuments(vector);
+        console.log('Top 3 similar documents:', similarDocuments); // 상위 3개 유사한 문서 결과를 콘솔에 출력
+
         const reply = await fetchData('/api/chat', 'POST', { userInput: comment.text, apiKey, selectedModel, corpName });
 
         if (reply.error) {

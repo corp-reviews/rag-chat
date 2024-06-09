@@ -53,3 +53,39 @@ export async function deleteAllElasticTitles(titles) {
         throw new Error(`Failed to delete all Elasticsearch titles: ${error.message}`);
     }
 }
+
+export async function searchSimilarDocuments(vector, index = 'pdf_objects', size = 3) {
+    const auth = await getElasticsearchAuth();
+    try {
+        const response = await axios.post(`https://elasticsearch.corp.reviews:9200/${index}/_search`, {
+            size,
+            query: {
+                script_score: {
+                    query: { match_all: {} },
+                    script: {
+                        source: "cosineSimilarity(params.query_vector, doc['vector']) + 1.0",
+                        params: { query_vector: vector }
+                    }
+                }
+            }
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': auth
+            }
+        });
+
+        if (response.data.hits && response.data.hits.hits) {
+            return response.data.hits.hits.map(hit => ({
+                id: hit._id,
+                score: hit._score,
+                source: hit._source
+            }));
+        } else {
+            throw new Error('Unexpected response structure');
+        }
+    } catch (error) {
+        console.error('Error searching similar documents:', error);
+        return { error: error.message };
+    }
+}
