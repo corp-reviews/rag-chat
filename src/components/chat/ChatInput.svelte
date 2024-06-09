@@ -52,7 +52,8 @@
 
         // 시스템 메시지 생성
         const systemMessage = similarDocuments.map(doc => doc.source.text).join('\n\n');
-        
+        console.log('System message:', systemMessage); // 시스템 메시지 콘솔에 출력
+
         // OpenAI API 요청
         const reply = await fetchData('/api/chat', 'POST', { userInput: comment.text, apiKey, selectedModel, corpName, systemMessage });
 

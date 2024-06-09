@@ -1,12 +1,13 @@
 // src/routes/api/chat/+server.js
 import { createLangchainClient, getLangchainResponse } from './openaiClient';
 import { handleError } from './errorHandler';
-import { SystemMessage, HumanMessage } from "@langchain/core/messages";  // 추가된 부분
+import { SystemMessage, HumanMessage } from "@langchain/core/messages";
 
 export async function POST({ request }) {
     try {
         const { userInput, apiKey, selectedModel, systemMessage } = await request.json();
         console.log('User input:', userInput);
+        console.log('System message:', systemMessage);  // 시스템 메시지 출력
 
         if (!apiKey) {
             return new Response(JSON.stringify({ error: 'API key is required' }), { status: 400 });
