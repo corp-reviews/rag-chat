@@ -1,4 +1,4 @@
-<!-- src/components/FileList.svelte -->
+<!-- src/components/PDFRAG/FileList.svelte -->
 <script>
     import { listFilesFromS3, deleteFileFromS3 } from '../../lib/s3';
     import { fetchData } from '../../lib/fetchHelper';
@@ -74,6 +74,8 @@
     };
 
     onMount(loadFiles);
+    
+    export { loadFiles }; // Export loadFiles for external use
 </script>
 
 <div class="w-full flex flex-col items-center" {...$$restProps}>

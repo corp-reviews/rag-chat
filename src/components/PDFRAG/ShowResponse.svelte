@@ -4,6 +4,7 @@
     import { onMount } from 'svelte';
     import axios from 'axios';
     import { elasticsearchUsername, elasticsearchPassword } from '../../stores/env';
+    import { vectorizeText } from '../../lib/vectorize'; // Import vectorizeText
 
     export let responses = writable([]);
     export let refreshElasticTitles;
@@ -16,62 +17,75 @@
 
     const toggleDetails = (file) => expanded = { ...expanded, [file]: !expanded[file] };
 
-    const groupParagraphs = (response) => {
+    const groupParagraphs = async (response) => {
         if (!response.data?.pages) return response;
 
         const groupedData = [], currentParagraph = [];
-        response.data.pages.forEach(page => {
-            if (!page.objects) return;
+        for (const page of response.data.pages) {
+            if (!page.objects) continue;
 
-            page.objects.forEach(item => {
+            for (const item of page.objects) {
                 if (item.bbox) {
                     if (currentParagraph.length === 0 || item.bbox.top === currentParagraph[0].bbox.top) {
                         currentParagraph.push(item);
                     } else {
-                        groupedData.push(createParagraph(response, page, currentParagraph));
+                        groupedData.push(await createParagraph(response, page, currentParagraph));
                         currentParagraph.length = 0;
                         currentParagraph.push(item);
                     }
                 } else {
-                    if (currentParagraph.length > 0) groupedData.push(createParagraph(response, page, currentParagraph));
-                    groupedData.push(createItem(response, page, item));
+                    if (currentParagraph.length > 0) groupedData.push(await createParagraph(response, page, currentParagraph));
+                    groupedData.push(await createItem(response, page, item));
                     currentParagraph.length = 0;
                 }
-            });
-            if (currentParagraph.length > 0) groupedData.push(createParagraph(response, page, currentParagraph));
-        });
+            }
+            if (currentParagraph.length > 0) groupedData.push(await createParagraph(response, page, currentParagraph));
+        }
 
-        postGroupedDataToElasticsearch(groupedData);
+        await postGroupedDataToElasticsearch(groupedData);
         return { ...response, data: groupedData };
     };
 
-    const createParagraph = (response, page, currentParagraph) => ({
-        file: response.file,
-        page: page.page,
-        type: currentParagraph[0].Type,
-        index: response.data.length + 1,
-        text: currentParagraph.map(i => i.Text).join(' '),
-        bbox: currentParagraph[0].bbox
-    });
+    const createParagraph = async (response, page, currentParagraph) => {
+        const text = currentParagraph.map(i => i.Text).join(' ');
+        const vector = await vectorizeText(text); // Vectorize the text
+        return {
+            file: response.file,
+            page: page.page,
+            type: currentParagraph[0].Type,
+            index: response.data.length + 1,
+            text,
+            vector, // Add vector to the paragraph
+            bbox: currentParagraph[0].bbox
+        };
+    };
 
-    const createItem = (response, page, item) => ({
-        file: response.file,
-        page: page.page,
-        type: item.Type,
-        index: response.data.length + 1,
-        text: item.Text,
-        bbox: item.bbox
-    });
+    const createItem = async (response, page, item) => {
+        const text = item.Text;
+        const vector = await vectorizeText(text); // Vectorize the text
+        return {
+            file: response.file,
+            page: page.page,
+            type: item.Type,
+            index: response.data.length + 1,
+            text,
+            vector, // Add vector to the item
+            bbox: item.bbox
+        };
+    };
 
     const postGroupedDataToElasticsearch = async (groupedData) => {
         posting.set(true);
         try {
             const auth = `Basic ${btoa(`${username}:${password}`)}`;
-            await Promise.all(groupedData.map(item => axios.post(
-                'https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/',
-                item,
-                { headers: { 'Content-Type': 'application/json', 'Authorization': auth } }
-            )));
+            await Promise.all(groupedData.map(async item => {
+                console.log("Posting to Elasticsearch:", item); // Log the data being sent
+                await axios.post(
+                    'https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/',
+                    item,
+                    { headers: { 'Content-Type': 'application/json', 'Authorization': auth } }
+                );
+            }));
             if (refreshElasticTitles) refreshElasticTitles();
         } catch (error) {
             console.error('Elasticsearch POST 실패:', error);
@@ -81,8 +95,8 @@
     };
 
     onMount(() => {
-        responses.subscribe(value => {
-            responseList = value.map(groupParagraphs);
+        responses.subscribe(async value => {
+            responseList = await Promise.all(value.map(groupParagraphs));
             value.forEach(response => expanded[response.file] ??= false);
         });
     });
