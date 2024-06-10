@@ -28,7 +28,7 @@
 
     let refreshElasticTitles;  // 이 줄을 추가
 
-    const setRefreshElasticTitles = (func) => {
+    export const setRefreshElasticTitles = (func) => {
         refreshElasticTitles = func;
     };
 </script>
@@ -48,7 +48,7 @@
         <Header />
         <Divider />
         <div class="flex flex-col flex-1 overflow-hidden">
-            <Chatbox {comments} {errorMessage} class="flex-1 overflow-auto" />
+            <Chatbox {comments} {errorMessage} className="flex-1 overflow-auto" />
         </div>
         <Divider />
         <div class="flex justify-between p-4 bg-gray-100 border-t border-gray-300">
@@ -56,7 +56,7 @@
             <ModelSelect {models} bind:selectedModel on:change={handleModelChange} />
         </div>
         <ChatInput {apiKey} {addComment} {removeTypingIndicator} {setError} {typing} {selectedModel} bind:selectedCorpName bind:selectedOption
-            class="w-full px-4 py-2 bg-gray-100"
+            className="w-full px-4 py-2 bg-gray-100"
         />
     </div>
 </div>

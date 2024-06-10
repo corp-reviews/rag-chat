@@ -7,7 +7,8 @@
 
     let fileListRef;
     let responses = writable([]);
-    let refreshElasticTitles;
+    export let refreshElasticTitles;
+
     let showRefreshButton = writable(false); // Add this state
 
     const handleFileAction = async () => {
@@ -43,7 +44,7 @@
         }
     };
 
-    const setRefreshElasticTitles = (refreshFunc) => {
+    export let setRefreshElasticTitles = (refreshFunc) => {
         refreshElasticTitles = refreshFunc;
     };
 </script>
@@ -55,10 +56,10 @@
             <p class="text-gray-500 text-sm">PDF 파일을 업로드하여 분석하세요.</p>
         </div>
         <FileList class="mb-4 border-b border-gray-300" bind:this={fileListRef} on:fileDeleted={handleFileAction} on:uploadSuccess={handleUploadSuccess} />
-        <ShowResponse {responses} class="w-full border-b border-gray-300" />
+        <ShowResponse {responses} />
     </div>
     <div class="w-3/4 h-full flex flex-col items-center px-4 border-l border-gray-300">
-        <ElasticSearchTitles class="w-full" {setRefreshElasticTitles} />
+        <ElasticSearchTitles {setRefreshElasticTitles} />
         {#if $showRefreshButton}
             <button class="mt-4 p-2 bg-blue-600 text-white rounded-md" on:click={handleRefresh}>새로고침</button>
         {/if}

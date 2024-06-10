@@ -11,8 +11,6 @@
     let uploadedFiles = writable([]);
     let uploadMessage = '', isUploading = false;
 
-    export let refreshElasticTitles; // Ensure this prop is received
-
     const dispatch = createEventDispatcher();
 
     const handleFileChange = (event) => selectedFiles = Array.from(event.target.files);
