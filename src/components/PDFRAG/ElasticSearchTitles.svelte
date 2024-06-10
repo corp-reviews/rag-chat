@@ -1,6 +1,6 @@
 <!-- src/components/PDFRAG/ElasticSearchTitles.svelte -->
 <script>
-    import { fetchElasticTitles, deleteElasticTitle, deleteAllElasticTitles } from '../../lib/elasticsearch';
+    import { fetchElasticTitles, deleteElasticTitle } from '../../lib/elasticsearch';
     import { onMount } from 'svelte';
     import Pagination from '../pagination/Pagination.svelte';
     import ProgressBar from '../common/ProgressBar.svelte';
@@ -54,7 +54,9 @@
                     await deleteElasticTitle(title.id);
                     deleteProgress.set(((index + 1) / elasticTitles.length) * 100);
                 }
-                await loadElasticTitles();
+                setTimeout(async () => {
+                    await loadElasticTitles();
+                }, 500); // 0.5초 지연 후 제목 리프레시
             } catch (error) {
                 console.error('모두 삭제 중 오류 발생: ' + error.message);
             }
