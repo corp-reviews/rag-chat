@@ -7,6 +7,7 @@
     import APIKeyInput from '../components/common/APIKeyInput.svelte';
     import ModelSelect from '../components/common/ModelSelect.svelte';
     import ChatContainer from '../components/chat/ChatContainer.svelte';
+	import ElasticSearchTitles from '../components/PDFRAG/ElasticSearchTitles.svelte';
 
     let comments = [];
     let apiKey = '';
@@ -21,17 +22,31 @@
     const setError = (message) => (errorMessage = message);
     const handleModelChange = (event) => (selectedModel = event.target.value);
 
-    let refreshElasticTitles;
+    export let refreshElasticTitles;
 
-    export const setRefreshElasticTitles = (func) => {
+    export let setRefreshElasticTitles = (func) => {
         refreshElasticTitles = func;
+    };
+
+    const handleRefresh = async () => {
+        if (refreshElasticTitles) {
+            console.log("Calling refreshElasticTitles function...");
+            await refreshElasticTitles();
+            console.log("refreshElasticTitles function called successfully.");
+        }
     };
 </script>
 
 <div class="flex h-screen bg-gray-100">
-    <PDFRAG {refreshElasticTitles} {setRefreshElasticTitles} />
+    <div class="w-1/4">
+        <PDFRAG {refreshElasticTitles} />
+    </div>
 
-    <div class="w-1/3 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+    <div class="flex-1 flex flex-col">
+        <ElasticSearchTitles {setRefreshElasticTitles} />
+    </div>
+
+    <div class="w-1/3 flex flex-col">
         <Header />
         <Divider />
         <ChatContainer {comments} {errorMessage} {apiKey} {selectedModel} {addComment} {removeTypingIndicator} {setError} {typing} />

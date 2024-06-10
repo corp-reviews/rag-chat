@@ -15,7 +15,7 @@
     const handleModelChange = (event) => (selectedModel = event.target.value);
 </script>
 
-<div class="flex flex-col flex-1 overflow-hidden">
+<div class="flex flex-col flex-1 overflow-hidden border border-gray-300 rounded-lg shadow-sm">
     <Chatbox {comments} {errorMessage} class="flex-1 overflow-auto" />
     <ChatInput {apiKey} {addComment} {removeTypingIndicator} {setError} {typing} {selectedModel} 
         class="w-full px-4 py-2 bg-gray-100"
