@@ -55,6 +55,7 @@
 
 	const createParagraph = async (response, page, currentParagraph) => {
 		const text = currentParagraph.map((i) => i.Text).join(' ');
+		if (!text.trim()) return; // 텍스트가 비어있으면 반환하지 않음
 		vectorizing.set(true); // 추가: vectorize 시작 시 상태 변경
 		const vector = await vectorizeText(text); // Vectorize the text
 		vectorizing.set(false); // 추가: vectorize 완료 시 상태 변경
@@ -71,6 +72,7 @@
 
 	const createItem = async (response, page, item) => {
 		const text = item.Text;
+		if (!text.trim()) return; // 텍스트가 비어있으면 반환하지 않음
 		vectorizing.set(true); // 추가: vectorize 시작 시 상태 변경
 		const vector = await vectorizeText(text); // Vectorize the text
 		vectorizing.set(false); // 추가: vectorize 완료 시 상태 변경
@@ -92,6 +94,7 @@
             console.log("Calling postGroupedDataToElasticsearch function...");
             await Promise.all(
                 groupedData.map(async (item) => {
+                    if (!item || !item.text.trim()) return; // 텍스트가 비어있으면 발송하지 않음
                     console.log('Posting to Elasticsearch:', item);
                     await axios.post('https://elasticsearch.corp.reviews:9200/pdf_objects/_doc/', item, {
                         headers: { 'Content-Type': 'application/json', Authorization: auth }
