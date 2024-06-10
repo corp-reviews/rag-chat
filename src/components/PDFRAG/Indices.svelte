@@ -75,7 +75,7 @@
 </script>
 
 <div class="flex flex-col items-center mt-5 w-full max-w-2xl px-4 overflow-y-auto" style="max-height: 600px;">
-    <h2 class="text-xl font-bold mb-4">ElasticSearch Titles</h2>
+    <h2 class="text-xl font-bold mb-4">Search Indices</h2>
     {#if $errorMessage}
         <p class="text-red-500">{$errorMessage}</p>
     {/if}

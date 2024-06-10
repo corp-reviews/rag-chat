@@ -26,7 +26,7 @@ export async function fetchElasticTitles() {
             throw new Error('Unexpected response structure');
         }
     } catch (error) {
-        throw new Error(`Failed to fetch Elasticsearch titles: ${error.message}`);
+        throw new Error(`Failed to fetch search indices: ${error.message}`);
     }
 }
 
@@ -50,7 +50,7 @@ export async function deleteAllElasticTitles(titles) {
             });
         }
     } catch (error) {
-        throw new Error(`Failed to delete all Elasticsearch titles: ${error.message}`);
+        throw new Error(`Failed to delete all search indices: ${error.message}`);
     }
 }
 

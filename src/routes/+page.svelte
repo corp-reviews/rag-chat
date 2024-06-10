@@ -7,7 +7,7 @@
     import APIKeyInput from '../components/common/APIKeyInput.svelte';
     import ModelSelect from '../components/common/ModelSelect.svelte';
     import ChatContainer from '../components/chat/ChatContainer.svelte';
-	import ElasticSearchTitles from '../components/PDFRAG/ElasticSearchTitles.svelte';
+	import ElasticSearchTitles from '../components/PDFRAG/Indices.svelte';
 
     let comments = [];
     let apiKey = '';
