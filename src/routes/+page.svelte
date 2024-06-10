@@ -34,7 +34,7 @@
 </script>
 
 <div class="flex h-screen bg-gray-100">
-    <div class="flex-1 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden mr-2">
+    <div class="w-2/3 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden mr-2">
         <div class="absolute top-4 left-4 z-10">
             <ViewSelect bind:selectedOption />
         </div>
@@ -44,7 +44,7 @@
             <PDFRAG {refreshElasticTitles} {setRefreshElasticTitles} />
         {/if}
     </div>
-    <div class="flex-1 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+    <div class="w-1/3 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden">
         <Header />
         <Divider />
         <div class="flex flex-col flex-1 overflow-hidden">

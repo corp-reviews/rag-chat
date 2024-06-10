@@ -48,23 +48,17 @@
     };
 </script>
 
-<div class="flex flex-col min-h-screen">
-    <div class="h-1/3 overflow-y-auto flex flex-col items-center mt-5 w-full max-w-2xl px-4">
+<div class="flex flex-row min-h-screen">
+    <div class="w-1/4 h-full flex flex-col items-center mt-5 px-4 border-r border-gray-300">
         <div class="text-center mb-4">
             <h1 class="text-2xl font-bold">PDF-RAG</h1>
             <p class="text-gray-500 text-sm">PDF 파일을 업로드하여 분석하세요.</p>
         </div>
-        <FileList class="mb-4" bind:this={fileListRef} on:fileDeleted={handleFileAction} on:uploadSuccess={handleUploadSuccess} />
+        <FileList class="mb-4 border-b border-gray-300" bind:this={fileListRef} on:fileDeleted={handleFileAction} on:uploadSuccess={handleUploadSuccess} />
+        <ShowResponse {responses} class="w-full border-b border-gray-300" />
     </div>
-    <hr class="my-8 w-full border-t-2 border-gray-300" />
-
-    <div class="h-1/3 overflow-y-auto w-full max-w-2xl px-4">
-        <ShowResponse {responses} />
-    </div>
-    <hr class="my-8 w-full border-t-2 border-gray-300" />
-
-    <div class="h-1/3 overflow-y-auto w-full max-w-2xl px-4">
-        <ElasticSearchTitles {setRefreshElasticTitles} />
+    <div class="w-3/4 h-full flex flex-col items-center px-4 border-l border-gray-300">
+        <ElasticSearchTitles class="w-full" {setRefreshElasticTitles} />
         {#if $showRefreshButton}
             <button class="mt-4 p-2 bg-blue-600 text-white rounded-md" on:click={handleRefresh}>새로고침</button>
         {/if}
