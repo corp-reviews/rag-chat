@@ -5,9 +5,7 @@
     import ChatInput from '../components/chat/ChatInput.svelte';
     import Header from '../components/common/Header.svelte';
     import Divider from '../components/common/Divider.svelte';
-    import DBLoader from '../components/company-RAG/DBLoader.svelte';
     import PDFRAG from '../components/PDFRAG/PDFRAG.svelte';
-    import ViewSelect from '../components/common/ViewSelect.svelte';
     import APIKeyInput from '../components/common/APIKeyInput.svelte';
     import ModelSelect from '../components/common/ModelSelect.svelte';
 
@@ -16,8 +14,6 @@
     let errorMessage = '';
     let selectedModel = 'gpt-3.5-turbo';
     const models = ['gpt-3.5-turbo', 'gpt-4-turbo', 'gpt-4o'];
-    let selectedCorpName = writable('');
-    let selectedOption = writable('PDFRAG');
 
     const typing = { author: 'gpt', text: '...', model: '' };
 
@@ -34,16 +30,8 @@
 </script>
 
 <div class="flex h-screen bg-gray-100">
-    <div class="w-2/3 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden mr-2">
-        <div class="absolute top-4 left-4 z-10">
-            <ViewSelect bind:selectedOption />
-        </div>
-        {#if $selectedOption === 'DBLoader'}
-            <DBLoader bind:selectedCorpName />
-        {:else}
-            <PDFRAG {refreshElasticTitles} {setRefreshElasticTitles} />
-        {/if}
-    </div>
+    <PDFRAG {refreshElasticTitles} {setRefreshElasticTitles} />
+
     <div class="w-1/3 flex flex-col border border-gray-300 rounded-lg shadow-sm overflow-hidden">
         <Header />
         <Divider />
@@ -55,7 +43,7 @@
             <APIKeyInput bind:apiKey />
             <ModelSelect {models} bind:selectedModel on:change={handleModelChange} />
         </div>
-        <ChatInput {apiKey} {addComment} {removeTypingIndicator} {setError} {typing} {selectedModel} bind:selectedCorpName bind:selectedOption
+        <ChatInput {apiKey} {addComment} {removeTypingIndicator} {setError} {typing} {selectedModel} 
             className="w-full px-4 py-2 bg-gray-100"
         />
     </div>

@@ -11,8 +11,6 @@
     export let setError;
     export let typing;
     export let selectedModel;
-    export let selectedCorpName;
-    export let selectedOption;
 
     let message = '';
 
@@ -36,7 +34,6 @@
         const typingComment = { ...typing, text: '...', model: selectedModel };
         addComment(typingComment);
 
-        const corpName = get(selectedCorpName);
 
         // 사용자 입력 메시지를 벡터화 시도
         const vector = await vectorizeText(comment.text);
@@ -55,7 +52,7 @@
         console.log('System message:', systemMessage); // 시스템 메시지 콘솔에 출력
 
         // OpenAI API 요청
-        const reply = await fetchData('/api/chat', 'POST', { userInput: comment.text, apiKey, selectedModel, corpName, systemMessage });
+        const reply = await fetchData('/api/chat', 'POST', { userInput: comment.text, apiKey, selectedModel, systemMessage });
 
         if (reply.error) {
             setError(reply.error);
@@ -68,18 +65,7 @@
 </script>
 
 <div class="flex items-start mt-2 mb-4 mx-4 bg-gray-100 space-x-2" {...$$restProps}>
-    {#if $selectedOption === 'DBLoader'}
-    <div class="w-1/4">
-        <label for="corp-name" class="block text-sm font-medium text-gray-700">기업명</label>
-        <input
-            id="corp-name"
-            class="mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 w-full h-10"
-            value={$selectedCorpName}
-            disabled
-        />
-    </div>
-    {/if}
-    <div class={$selectedOption === 'DBLoader' ? 'w-3/4' : 'w-full'}>
+    <div class='w-full'>
         <label for="message" class="block text-sm font-medium text-gray-700">질문</label>
         <input
             id="message"
